@@ -130,3 +130,10 @@ dmypy.json
 
 # vscode config
 .vscode
+
+# latex temporary files
+.aux
+.fdb_latexmk
+.fls
+.log
+.synctex.gz
