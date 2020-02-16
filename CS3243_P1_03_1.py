@@ -1,8 +1,13 @@
 import os
 import sys
 
-import time
+from collections import deque
 
+class Node(object):
+    def __init__(self, state, parent, move):
+        self.state = state
+        self.parent = parent
+        self.move = move
 
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
@@ -10,96 +15,95 @@ class Puzzle(object):
         self.init_state = self.list_to_tuple(init_state)
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
-        self.actions = list()
-        self.visited_state = set()
+        self.goal_node = None
 
     def solve(self):
-        #TODO
-        # implement your search algorithm here
-        
-        # return ["LEFT", "RIGHT"] # sample output 
-        return self.BFS()
+        self.BFS()
+        return self.backtrace()
     
     def BFS(self):
-        frontier = []
-        frontier_state_set = set()
-        frontier.append((self.init_state, []))
-        frontier_state_set.add(self.init_state)
-        count = 0
+        explored = set()
+        frontier = deque([Node(self.init_state, None, None)])
+
         while frontier:
-            current = frontier.pop()
-            frontier_state_set.remove(current[0])
-            self.visited_state.add(current[0])
+            node = frontier.popleft()
+            explored.add(node.state)
 
-            if current[0] == self.goal_state:
-                return current[1]
-            
-            expanded = self.next_step(current)
-            for node in expanded:
-                if not ( (node[0] in self.visited_state) or (node[0] in frontier_state_set) ):
-                    frontier.append(node)
-                    frontier_state_set.add(node[0])
-        return ["UNSOLVABLE"]
+            if node.state == self.goal_state:
+                self.goal_node = node
+                return frontier
 
-    def beautify_print(self, state):
-        print("---------------")
-        for i in range(self.N):
-            for j in range(self.N):
-                print("%d" % (state[i*self.N+j])),
-            print
-        print("---------------")
+            neighbors = self.expand(node)
+            for neighbor in neighbors:
+                if neighbor.state not in explored:
+                    frontier.append(neighbor)
+                    explored.add(neighbor.state)
 
-    def next_step(self, node):
-        current_state = node[0]
-        current_actions = node[1]
-        expanded = []
-        stop = False
-        for r in range(self.N):
-            for c in range(self.N):
-                if current_state[r * self.N + c] == 0:
-                    if c >= 1: # RIGHT
-                        self.expand(current_state, current_actions, r, c, "RIGHT", expanded)
-                    if c < self.N - 1: # LEFT
-                        self.expand(current_state, current_actions, r, c, "LEFT", expanded)
-                    if r >= 1: # DOWN
-                        self.expand(current_state, current_actions, r, c, "DOWN", expanded)
-                    if r < self.N - 1: # UP
-                        self.expand(current_state, current_actions, r, c, "UP", expanded)
-                    stop = True
-                    break
-            if stop:
-                break
-        return expanded
+    def expand(self, node):
+        neighbors = list()
+        neighbors.append(Node(self.move(node.state, 1), node, 1))
+        neighbors.append(Node(self.move(node.state, 2), node, 2))
+        neighbors.append(Node(self.move(node.state, 3), node, 3))
+        neighbors.append(Node(self.move(node.state, 4), node, 4))
+        return [neighbor for neighbor in neighbors if neighbor.state]
     
-    def move(self, state, zr, zc, action):
+    def backtrace(self):
+        current_node = self.goal_node
+        if not current_node:
+            return ["UNSOLVABLE"]
+
+        moves = []
+        while current_node.state != self.init_state:
+            if current_node.move == 1:
+                moves.append("LEFT")
+            elif current_node.move == 2:
+                moves.append("RIGHT")
+            elif current_node.move == 3:
+                moves.append("UP")
+            elif current_node.move == 4:
+                moves.append("DOWN")
+            else:
+                raise Exception("Illegal action found in backtrace function: " + action)
+            current_node = current_node.parent
+        moves.reverse()
+        return moves
+    
+    def move(self, state, action):
         new_state = list(state)
-        if action == "LEFT":
+        index =new_state.index(0)
+        zr = index / self.N
+        zc = index % self.N
+        if action == 1: # LEFT
             # s(zr,zc) = s(zr, zc+1), s(zr, zc+1) = 0
-            new_state[zr*self.N + zc] = new_state[zr*self.N + zc + 1]
-            new_state[zr*self.N + zc + 1] = 0
-        elif action == "RIGHT":
+            if zc < self.N-1:
+                new_state[zr*self.N + zc] = new_state[zr*self.N + zc + 1]
+                new_state[zr*self.N + zc + 1] = 0
+            else:
+                return None
+        elif action == 2: # RIGHT
             # s(zr,zc) = s(zr, zc-1), s(zr, zc-1) = 0
-            new_state[zr*self.N + zc] = new_state[zr*self.N + zc - 1]
-            new_state[zr*self.N + zc - 1] = 0
-        elif action == "UP":
+            if zc >= 1:
+                new_state[zr*self.N + zc] = new_state[zr*self.N + zc - 1]
+                new_state[zr*self.N + zc - 1] = 0
+            else:
+                return None
+        elif action == 3: # UP
             # s(zr,zc) = s(zr+1, zc), s(zr, zc+1) = 0
-            new_state[zr*self.N + zc] = new_state[(zr+1)*self.N + zc]
-            new_state[(zr+1)*self.N + zc] = 0
-        elif action == "DOWN":
+            if zr < self.N-1:
+                new_state[zr*self.N + zc] = new_state[(zr+1)*self.N + zc]
+                new_state[(zr+1)*self.N + zc] = 0
+            else:
+                return None
+        elif action == 4: # DOWN
             # s(zr,zc) = s(zr-1, zc), s(zr, zc-1) = 0
-            new_state[zr*self.N + zc] = new_state[(zr-1)*self.N + zc]
-            new_state[(zr-1)*self.N + zc] = 0
+            if zr >= 1:
+                new_state[zr*self.N + zc] = new_state[(zr-1)*self.N + zc]
+                new_state[(zr-1)*self.N + zc] = 0
+            else:
+                return None
         else:
             raise Exception("Illegal action found in move function: " + action)
         return tuple(new_state)
-            
-    def expand(self, current_state, current_actions, r, c, action, expanded):
-        new_state = self.move(current_state, r, c, action)
-        new_action = list(current_actions)
-        new_action.append(action)
-        expanded.append((new_state, new_action))
-
-    # you may add more functions if you think is useful
 
     # flatten the nested list to one-dimensional tuple
     def list_to_tuple(self, lst):
