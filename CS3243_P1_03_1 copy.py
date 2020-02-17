@@ -20,14 +20,31 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
+        # BEGIN linear conflict
+        self.goal_position = {} # a map from number to its goal position
+        for i in range(len(self.goal_state)):
+            self.goal_position[self.goal_state[i]] = i
+        # END linear conflict
 
     def solve(self):
         self.AStar()
         return self.backtrace()
 
     def h(self, state):
-        return sum(abs(b % self.N - g % self.N) + abs(b // self.N - g // self.N)
-               for b, g in ((state.index(i), self.goal_state.index(i)) for i in range(1, self.N)))
+        count = 0
+        for row in range(self.N):
+            for k in range(self.N):
+                if state[row*self.N + k] == 0:
+                    continue
+                for j in range(k+1, self.N):
+                    if state[row*self.N + j] == 0:
+                        continue
+                    # now t_j is guaranteed to be on the same line, right of t_k
+                    goal_pos_j = self.goal_position[state[row*self.N + j]]
+                    goal_pos_k = self.goal_position[state[row*self.N + k]]
+                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                        count = count = 1
+        return count
 
     def AStar(self):
         explored = set()
@@ -37,34 +54,25 @@ class Puzzle(object):
 
         key = self.h(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
-        entry = (key, 0, root)
+        entry = (key, root)
         heappush(heap, entry)
-        heap_entry[root.state] = entry
 
         while heap:
             heap_node = heappop(heap)
-            explored.add(heap_node[2].state)
+            explored.add(heap_node[1].state)
 
-            if heap_node[2].state == self.goal_state:
-                self.goal_node = heap_node[2]
+            if heap_node[1].state == self.goal_state:
+                self.goal_node = heap_node[1]
                 return heap
 
-            neighbors = self.expand(heap_node[2])
+            neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
                 neighbor.key = neighbor.cost + self.h(neighbor.state)
-                entry = (neighbor.key, neighbor.move, neighbor)
+                entry = (neighbor.key, neighbor)
                 if neighbor.state not in explored:
                     heappush(heap, entry)
                     explored.add(neighbor.state)
-                    heap_entry[neighbor.state] = entry
-                elif neighbor.state in heap_entry and neighbor.key < heap_entry[neighbor.state][2].key:
-                    hindex = heap.index((heap_entry[neighbor.state][2].key,
-                                        heap_entry[neighbor.state][2].move,
-                                        heap_entry[neighbor.state][2]))
-                    heap[int(hindex)] = entry
-                    heap_entry[neighbor.state] = entry
-                    heapify(heap)
 
     
     def BFS(self):
