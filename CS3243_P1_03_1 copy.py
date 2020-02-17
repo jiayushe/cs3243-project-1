@@ -31,17 +31,38 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
+        # BEGIN linear conflict
+        self.goal_position = {} # a map from number to its goal position
+        for i in range(len(self.goal_state)):
+            self.goal_position[self.goal_state[i]] = i
+        # END linear conflict
 
     def solve(self):
         self.BFS()
         return self.backtrace()
 
-    def evaluation_function_1(self, state):
-        return 1
+    # BEGIN linear conflict
+    def linear_conflict(self, node):
+        state = node.state
+        count = 0
+        for row in range(self.N):
+            for k in range(self.N):
+                if state[row*self.N + k] == 0:
+                    continue
+                for j in range(k+1, self.N):
+                    if state[row*self.N + j] == 0:
+                        continue
+                    # now t_j is guaranteed to be on the same line, right of t_k
+                    goal_pos_j = self.goal_position[state[row*self.N + j]]
+                    goal_pos_k = self.goal_position[state[row*self.N + k]]
+                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                        count = count = 1
+        return count
+    # END linear conflict
     
     def BFS(self):
         explored = set()
-        frontier = PriorityQueue(initial=[Node(self.init_state, None, None)], key=self.evaluation_function_1)
+        frontier = PriorityQueue(initial=[Node(self.init_state, None, None)], key=self.linear_conflict)
 
         while frontier:
             node = frontier.pop()
