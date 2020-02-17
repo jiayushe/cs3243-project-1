@@ -1,28 +1,17 @@
 import os
 import sys
 
-import heapq
-
-class PriorityQueue(object):
-    def __init__(self, initial=None, key=lambda x: x):
-        self.key = key
-        if initial:
-            self._data = [(key(item), item) for item in initial]
-            heapq.heapify(self._data)
-        else:
-            self._data = []
-    
-    def push(self, item):
-        heapq.heappush(self._data, (self.key(item), item))
-
-    def pop(self):
-        return heapq.heappop(self._data)[1]
+from collections import deque
+from heapq import heappush, heappop, heapify
+import itertools
 
 class Node(object):
-    def __init__(self, state, parent, move):
+    def __init__(self, state, parent, move, cost, key):
         self.state = state
         self.parent = parent
         self.move = move
+        self.cost = cost
+        self.key = key
 
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
@@ -31,41 +20,59 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
-        # BEGIN linear conflict
-        self.goal_position = {} # a map from number to its goal position
-        for i in range(len(self.goal_state)):
-            self.goal_position[self.goal_state[i]] = i
-        # END linear conflict
 
     def solve(self):
-        self.BFS()
+        self.AStar()
         return self.backtrace()
 
-    # BEGIN linear conflict
-    def linear_conflict(self, node):
-        state = node.state
-        count = 0
-        for row in range(self.N):
-            for k in range(self.N):
-                if state[row*self.N + k] == 0:
-                    continue
-                for j in range(k+1, self.N):
-                    if state[row*self.N + j] == 0:
-                        continue
-                    # now t_j is guaranteed to be on the same line, right of t_k
-                    goal_pos_j = self.goal_position[state[row*self.N + j]]
-                    goal_pos_k = self.goal_position[state[row*self.N + k]]
-                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
-                        count = count = 1
-        return count
-    # END linear conflict
+    def h(self, state):
+        return sum(abs(b % self.N - g % self.N) + abs(b // self.N - g // self.N)
+               for b, g in ((state.index(i), self.goal_state.index(i)) for i in range(1, self.N)))
+
+    def AStar(self):
+        explored = set()
+        heap = list()
+        heap_entry = {}
+        counter =  itertools.count()
+
+        key = self.h(self.init_state)
+        root = Node(self.init_state, None, None, 0, key)
+        entry = (key, 0, root)
+        heappush(heap, entry)
+        heap_entry[root.state] = entry
+
+        while heap:
+            heap_node = heappop(heap)
+            explored.add(heap_node[2].state)
+
+            if heap_node[2].state == self.goal_state:
+                self.goal_node = heap_node[2]
+                return heap
+
+            neighbors = self.expand(heap_node[2])
+
+            for neighbor in neighbors:
+                neighbor.key = neighbor.cost + self.h(neighbor.state)
+                entry = (neighbor.key, neighbor.move, neighbor)
+                if neighbor.state not in explored:
+                    heappush(heap, entry)
+                    explored.add(neighbor.state)
+                    heap_entry[neighbor.state] = entry
+                elif neighbor.state in heap_entry and neighbor.key < heap_entry[neighbor.state][2].key:
+                    hindex = heap.index((heap_entry[neighbor.state][2].key,
+                                        heap_entry[neighbor.state][2].move,
+                                        heap_entry[neighbor.state][2]))
+                    heap[int(hindex)] = entry
+                    heap_entry[neighbor.state] = entry
+                    heapify(heap)
+
     
     def BFS(self):
         explored = set()
-        frontier = PriorityQueue(initial=[Node(self.init_state, None, None)], key=self.linear_conflict)
+        frontier = deque([Node(self.init_state, None, None, 0, 0)])
 
         while frontier:
-            node = frontier.pop()
+            node = frontier.popleft()
             explored.add(node.state)
 
             if node.state == self.goal_state:
@@ -75,15 +82,15 @@ class Puzzle(object):
             neighbors = self.expand(node)
             for neighbor in neighbors:
                 if neighbor.state not in explored:
-                    frontier.push(neighbor)
+                    frontier.append(neighbor)
                     explored.add(neighbor.state)
 
     def expand(self, node):
         neighbors = list()
-        neighbors.append(Node(self.move(node.state, 1), node, 1))
-        neighbors.append(Node(self.move(node.state, 2), node, 2))
-        neighbors.append(Node(self.move(node.state, 3), node, 3))
-        neighbors.append(Node(self.move(node.state, 4), node, 4))
+        neighbors.append(Node(self.move(node.state, 1), node, 1, node.cost+1, 0))
+        neighbors.append(Node(self.move(node.state, 2), node, 2, node.cost+1, 0))
+        neighbors.append(Node(self.move(node.state, 3), node, 3, node.cost+1, 0))
+        neighbors.append(Node(self.move(node.state, 4), node, 4, node.cost+1, 0))
         return [neighbor for neighbor in neighbors if neighbor.state]
     
     def backtrace(self):
