@@ -23,32 +23,19 @@ class Puzzle(object):
         self.goal_position = {} # a map from number to its goal position
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
-<<<<<<< HEAD:CS3243_P1_03_1 copy.py
         # END linear conflict
         # BEGIN profiling
         self.state_visited_count = 0
         self.max_depth = 0
         # END profiling
-=======
->>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
 
     def solve(self):
         self.AStar()
         res = self.backtrace()
-<<<<<<< HEAD:CS3243_P1_03_1 copy.py
-        print("--- %s seconds ---" % (time.time() - start_time))
-        print("--- %d states ---" % (self.state_visited_count))
-        print("--- max depth %d ---" % (self.max_depth))
-        return res
-
-    # manhattan distance
-    def manhattan_distance(self, state):
-=======
         return res
 
     # manhattan
     def manhattan(self, state):
->>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
         count = 0;
         for i in range(len(state)):
             goal_X, goal_Y = self.goal_position[state[i]] / self.N, self.goal_position[state[i]] % self.N
@@ -56,35 +43,8 @@ class Puzzle(object):
             count += abs(goal_X-X) + abs(goal_Y-Y)
         return count
 
-<<<<<<< HEAD:CS3243_P1_03_1 copy.py
-    # source: https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru/stp_wd_translation_en.htm
-    def invert_distance(self, state):
-        # count = 0
-        # for i in range(self.N):
-        #     for j in range(self.N):
-        #         for k in range(j+1, self.N):
-        #             ind_j = i * self.N + j
-        #             ind_k = i * self.N + k
-        #             if state[ind_k] > state[ind_j]:
-        #                 count = count + 1
-        #             ind_j = j * self.N + i
-        #             ind_k = k * self.N + i
-        #             if state[ind_k] > state[ind_j]:
-        #                 count = count + 1
-        # return count
-        return 0
-
-    def h(self, state):
-        # return max(self.manhattan_distance(state), self.invert_distance(state))
-        return self.manhattan_distance(state) + 2*self.linear_conflict(state)
-        # return self.misplaced_tile(state)
-
-    # linear conflict
-    def linear_conflict(self, state):
-=======
     #linear conflict
     def linearconflict(self, state):
->>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
         count = 0
         for row in range(self.N):
             for k in range(self.N):
@@ -94,16 +54,6 @@ class Puzzle(object):
                     if state[row*self.N + j] == 0:
                         continue
                     # now t_j is guaranteed to be on the same line, right of t_k
-<<<<<<< HEAD:CS3243_P1_03_1 copy.py
-                    goal_pos_j = self.goal_position[state[row*self.N + j]]
-                    goal_pos_k = self.goal_position[state[row*self.N + k]]
-                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
-                        count = count = 1
-        return count
-
-    # misplaced tile count
-    def misplaced_tile(self, state):
-=======
                     goal_pos_j = state[row*self.N + j]
                     goal_pos_k = state[row*self.N + k]
                     if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
@@ -112,7 +62,6 @@ class Puzzle(object):
 
     # misplaced tile count
     def misplaced(self, state):
->>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
         count = 0
         for i in range(len(self.goal_state)):
             if self.goal_state[i] != state[i]:
@@ -122,10 +71,6 @@ class Puzzle(object):
     def AStar(self):
         explored = set()
         heap = list()
-<<<<<<< HEAD:CS3243_P1_03_1 copy.py
-        heap_entry = {}
-=======
->>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
 
         key = self.linearconflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
