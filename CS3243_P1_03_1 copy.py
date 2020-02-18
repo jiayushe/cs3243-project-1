@@ -30,21 +30,39 @@ class Puzzle(object):
         self.AStar()
         return self.backtrace()
 
+    # manhattan
     def h(self, state):
-        count = 0
-        for row in range(self.N):
-            for k in range(self.N):
-                if state[row*self.N + k] == 0:
-                    continue
-                for j in range(k+1, self.N):
-                    if state[row*self.N + j] == 0:
-                        continue
-                    # now t_j is guaranteed to be on the same line, right of t_k
-                    goal_pos_j = self.goal_position[state[row*self.N + j]]
-                    goal_pos_k = self.goal_position[state[row*self.N + k]]
-                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
-                        count = count = 1
+        count = 0;
+        for i in range(len(state)):
+            goal_X, goal_Y = self.goal_position[state[i]] / self.N, self.goal_position[state[i]] % self.N
+            X, Y = i / self.N, i % self.N
+            count += abs(goal_X-X) + abs(goal_Y-Y)
         return count
+
+    # linear conflict
+    # def h(self, state):
+    #     count = 0
+    #     for row in range(self.N):
+    #         for k in range(self.N):
+    #             if state[row*self.N + k] == 0:
+    #                 continue
+    #             for j in range(k+1, self.N):
+    #                 if state[row*self.N + j] == 0:
+    #                     continue
+    #                 # now t_j is guaranteed to be on the same line, right of t_k
+    #                 goal_pos_j = self.goal_position[state[row*self.N + j]]
+    #                 goal_pos_k = self.goal_position[state[row*self.N + k]]
+    #                 if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+    #                     count = count = 1
+    #     return count
+
+    # misplaced tile count
+    # def h(self, state):
+    #     count = 0
+    #     for i in range(len(self.goal_state)):
+    #         if self.goal_state[i] != state[i]:
+    #             count = count + 1
+    #     return count
 
     def AStar(self):
         explored = set()
