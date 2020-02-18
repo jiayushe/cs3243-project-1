@@ -20,11 +20,9 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
-        # BEGIN linear conflict
         self.goal_position = {} # a map from number to its goal position
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
-        # END linear conflict
 
     def solve(self):
         self.AStar()
@@ -32,7 +30,7 @@ class Puzzle(object):
         return res
 
     # manhattan
-    def h(self, state):
+    def manhattan(self, state):
         count = 0;
         for i in range(len(state)):
             goal_X, goal_Y = self.goal_position[state[i]] / self.N, self.goal_position[state[i]] % self.N
@@ -40,36 +38,36 @@ class Puzzle(object):
             count += abs(goal_X-X) + abs(goal_Y-Y)
         return count
 
-    # linear conflict
-    # def h(self, state):
-    #     count = 0
-    #     for row in range(self.N):
-    #         for k in range(self.N):
-    #             if state[row*self.N + k] == 0:
-    #                 continue
-    #             for j in range(k+1, self.N):
-    #                 if state[row*self.N + j] == 0:
-    #                     continue
-    #                 # now t_j is guaranteed to be on the same line, right of t_k
-    #                 goal_pos_j = self.goal_position[state[row*self.N + j]]
-    #                 goal_pos_k = self.goal_position[state[row*self.N + k]]
-    #                 if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
-    #                     count = count = 1
-    #     return count
+    #linear conflict
+    def linearconflict(self, state):
+        count = 0
+        for row in range(self.N):
+            for k in range(self.N):
+                if state[row*self.N + k] == 0:
+                    continue
+                for j in range(k+1, self.N):
+                    if state[row*self.N + j] == 0:
+                        continue
+                    # now t_j is guaranteed to be on the same line, right of t_k
+                    goal_pos_j = state[row*self.N + j]
+                    goal_pos_k = state[row*self.N + k]
+                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                        count += 1
+        return count * 2 + self.manhattan(state)
 
     # misplaced tile count
-    # def h(self, state):
-    #     count = 0
-    #     for i in range(len(self.goal_state)):
-    #         if self.goal_state[i] != state[i]:
-    #             count = count + 1
-    #     return count
+    def misplaced(self, state):
+        count = 0
+        for i in range(len(self.goal_state)):
+            if self.goal_state[i] != state[i]:
+                count = count + 1
+        return count
 
     def AStar(self):
         explored = set()
         heap = list()
 
-        key = self.h(self.init_state)
+        key = self.linearconflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
@@ -85,7 +83,7 @@ class Puzzle(object):
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.h(neighbor.state)
+                neighbor.key = neighbor.cost + self.linearconflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
                 if neighbor.state not in explored:
                     heappush(heap, entry)
