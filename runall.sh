@@ -14,15 +14,15 @@ echo_cyan() {
     echo -ne "\033[0m"
 }
 
-if [ -z "$1" ]
+if [ $# -ne 2 ]
 then
-    echo "Enter the index of the solution file as the first argument."
-    echo "eg: ./runall.sh 1"
+    echo "Format:  ./runall.sh solution_index time_limit"
+    echo "Example: ./runall.sh 1 10"
     exit 0
 fi
 
-timelimit="10"
 solution="CS3243_P1_02_$1.py"
+timelimit=$2
 
 for i in ./public_tests_p1/*/*.txt
 do
