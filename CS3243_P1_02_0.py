@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 from collections import deque
 from heapq import heappush, heappop, heapify
@@ -28,10 +27,8 @@ class Puzzle(object):
         # END linear conflict
 
     def solve(self):
-        start_time = time.time()
         self.AStar()
         res = self.backtrace()
-        print("--- %s seconds ---" % (time.time() - start_time))
         return res
 
     # manhattan
