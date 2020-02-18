@@ -137,3 +137,6 @@ dmypy.json
 .fls
 .log
 .synctex.gz
+
+# output files
+*.out

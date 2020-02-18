@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 from collections import deque
 from heapq import heappush, heappop, heapify
@@ -21,20 +20,22 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
-        # BEGIN linear conflict
         self.goal_position = {} # a map from number to its goal position
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
+<<<<<<< HEAD:CS3243_P1_03_1 copy.py
         # END linear conflict
         # BEGIN profiling
         self.state_visited_count = 0
         self.max_depth = 0
         # END profiling
+=======
+>>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
 
     def solve(self):
-        start_time = time.time()
         self.AStar()
         res = self.backtrace()
+<<<<<<< HEAD:CS3243_P1_03_1 copy.py
         print("--- %s seconds ---" % (time.time() - start_time))
         print("--- %d states ---" % (self.state_visited_count))
         print("--- max depth %d ---" % (self.max_depth))
@@ -42,6 +43,12 @@ class Puzzle(object):
 
     # manhattan distance
     def manhattan_distance(self, state):
+=======
+        return res
+
+    # manhattan
+    def manhattan(self, state):
+>>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
         count = 0;
         for i in range(len(state)):
             goal_X, goal_Y = self.goal_position[state[i]] / self.N, self.goal_position[state[i]] % self.N
@@ -49,6 +56,7 @@ class Puzzle(object):
             count += abs(goal_X-X) + abs(goal_Y-Y)
         return count
 
+<<<<<<< HEAD:CS3243_P1_03_1 copy.py
     # source: https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru/stp_wd_translation_en.htm
     def invert_distance(self, state):
         # count = 0
@@ -73,6 +81,10 @@ class Puzzle(object):
 
     # linear conflict
     def linear_conflict(self, state):
+=======
+    #linear conflict
+    def linearconflict(self, state):
+>>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
         count = 0
         for row in range(self.N):
             for k in range(self.N):
@@ -82,6 +94,7 @@ class Puzzle(object):
                     if state[row*self.N + j] == 0:
                         continue
                     # now t_j is guaranteed to be on the same line, right of t_k
+<<<<<<< HEAD:CS3243_P1_03_1 copy.py
                     goal_pos_j = self.goal_position[state[row*self.N + j]]
                     goal_pos_k = self.goal_position[state[row*self.N + k]]
                     if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
@@ -90,6 +103,16 @@ class Puzzle(object):
 
     # misplaced tile count
     def misplaced_tile(self, state):
+=======
+                    goal_pos_j = state[row*self.N + j]
+                    goal_pos_k = state[row*self.N + k]
+                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                        count += 1
+        return count * 2 + self.manhattan(state)
+
+    # misplaced tile count
+    def misplaced(self, state):
+>>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
         count = 0
         for i in range(len(self.goal_state)):
             if self.goal_state[i] != state[i]:
@@ -99,9 +122,12 @@ class Puzzle(object):
     def AStar(self):
         explored = set()
         heap = list()
+<<<<<<< HEAD:CS3243_P1_03_1 copy.py
         heap_entry = {}
+=======
+>>>>>>> 26e7779edab6b5afe9d36ca96a450c2022b22254:CS3243_P1_02_0.py
 
-        key = self.h(self.init_state)
+        key = self.linearconflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
@@ -117,7 +143,7 @@ class Puzzle(object):
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.h(neighbor.state)
+                neighbor.key = neighbor.cost + self.linearconflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
                 if neighbor.state not in explored:
                     self.state_visited_count += 1
@@ -125,7 +151,6 @@ class Puzzle(object):
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
                     explored.add(neighbor.state)
-
     
     def BFS(self):
         explored = set()
@@ -169,41 +194,41 @@ class Puzzle(object):
             elif current_node.move == 4:
                 moves.append("DOWN")
             else:
-                raise Exception("Illegal action found in backtrace function: " + action)
+                raise Exception("Illegal action found in backtrace function: " + current_node.move)
             current_node = current_node.parent
         moves.reverse()
         return moves
     
     def move(self, state, action):
         new_state = list(state)
-        index =new_state.index(0)
+        index = new_state.index(0)
         zr = index / self.N
         zc = index % self.N
         if action == 1: # LEFT
             # s(zr,zc) = s(zr, zc+1), s(zr, zc+1) = 0
             if zc < self.N-1:
-                new_state[zr*self.N + zc] = new_state[zr*self.N + zc + 1]
+                new_state[index] = new_state[zr*self.N + zc + 1]
                 new_state[zr*self.N + zc + 1] = 0
             else:
                 return None
         elif action == 2: # RIGHT
             # s(zr,zc) = s(zr, zc-1), s(zr, zc-1) = 0
             if zc >= 1:
-                new_state[zr*self.N + zc] = new_state[zr*self.N + zc - 1]
+                new_state[index] = new_state[zr*self.N + zc - 1]
                 new_state[zr*self.N + zc - 1] = 0
             else:
                 return None
         elif action == 3: # UP
             # s(zr,zc) = s(zr+1, zc), s(zr, zc+1) = 0
             if zr < self.N-1:
-                new_state[zr*self.N + zc] = new_state[(zr+1)*self.N + zc]
+                new_state[index] = new_state[(zr+1)*self.N + zc]
                 new_state[(zr+1)*self.N + zc] = 0
             else:
                 return None
         elif action == 4: # DOWN
             # s(zr,zc) = s(zr-1, zc), s(zr, zc-1) = 0
             if zr >= 1:
-                new_state[zr*self.N + zc] = new_state[(zr-1)*self.N + zc]
+                new_state[index] = new_state[(zr-1)*self.N + zc]
                 new_state[(zr-1)*self.N + zc] = 0
             else:
                 return None
