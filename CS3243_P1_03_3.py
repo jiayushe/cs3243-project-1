@@ -13,6 +13,8 @@ up = "UP"
 
 ######################
 
+## todo
+## change to use node instead of storing solution
 
 ## helper class ##
 
@@ -42,11 +44,20 @@ class PriorityQueue:
     def __len__(self):
         return len(self.queue)
 
+class Node:
+    def __init__(self, fval, state, parent, move, depth):
+        self.fval = fval
+        self.parent = parent
+        self.move = move
+        self.state = state
+        self.tree_depth = depth
+
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
         self.grid_size = len(init_state)
         self.init_state = self.list_to_tuple(init_state)
         self.goal_state = self.list_to_tuple(goal_state)
+        self.goal = None
 
     def list_to_tuple(self, lst):
         return tuple([elem for t in lst for elem in t])
@@ -73,7 +84,6 @@ class Puzzle(object):
         moves = [left,right,down,up]
         k = self.grid_size
         blank_position = self.find_blank()
-        solution = []
         pq = PriorityQueue()
         seen_states = set()
         curr_state = self.init_state
@@ -90,18 +100,15 @@ class Puzzle(object):
                 
                 if self.is_valid_move(move, blank_position):
                     
-                    #state_copy = copy.deepcopy(curr_state)
-    
-                    func_value,new_state,new_moves,new_blank_position = self.make_move(curr_f_val,move, curr_state, blank_position,solution)
+                    func_value,new_state,new_moves,new_blank_position = self.make_move(move, curr_state, blank_position)
                     
                     if new_state not in seen_states:
-                        pq.add((func_value,new_state,new_moves,new_blank_position))
+                        pq.add((func_value,new_state,new_blank_position))
 
             if pq.is_empty():
                 return ["UNSOLVABLE"] 
             winning_move = pq.poll()
             curr_state = winning_move[1]  # make best move according to heuristic
-            solution = winning_move[2]  # add move to solution set
             blank_position = winning_move[3]
             print(curr_f_val)
             curr_f_val = winning_move[0]
@@ -129,34 +136,35 @@ class Puzzle(object):
                 return False  # blank on bottom row
         return True
 
-    def make_move(self, prev_f_val, move, state, blank_position,past_moves):
+    def make_move(self, move, state, blank_position,past_moves):
         k = self.grid_size
         new_state = list(state)  
         blank_column = blank_position % k 
         blank_row = blank_position // k
+        g_n = len(past_moves) + 1
         
         if move == left: # blank switches place with number to it's right 
             
             new_state[blank_position + 1], new_state[blank_position] = new_state[blank_position], new_state[blank_position + 1]
-            func_value = heuristic(new_state) + prev_f_val + 1
+            func_value = heuristic(new_state) + g_n
             new_blank_position = blank_position+1
 
         elif move == right: # blank switches place with number to it's left 
             
             new_state[blank_position - 1], new_state[blank_position] = new_state[blank_position], new_state[blank_position - 1]
-            func_value = heuristic(new_state) + prev_f_val + 1
+            func_value = heuristic(new_state) + g_n
             new_blank_position = blank_position-1
 
         elif move == down: # blank switches place with number above it
             
             new_state[(blank_row-1) * k + blank_column], new_state[blank_position] = new_state[blank_position], new_state[(blank_row-1) * k + blank_column]
-            func_value = heuristic(new_state) + prev_f_val + 1
+            func_value = heuristic(new_state) + g_n
             new_blank_position = (blank_row-1) * k + blank_column
 
         else:   # blank switches place with number below it
             
             new_state[(blank_row+1) * k + blank_column], new_state[blank_position] = new_state[blank_position], new_state[(blank_row+1) * k + blank_column]
-            func_value = heuristic(new_state) + prev_f_val + 1
+            func_value = heuristic(new_state) + g_n
             new_blank_position = (blank_row+1) * k + blank_column
 
         new_moves = past_moves + [move,]
@@ -245,11 +253,11 @@ def manhattan_distance_1d(state): # works
 
 # n = 4 cases
 
-init_state = [[1,2,3,4],[5,6,7,8],[10,11,0,12],[9,13,15,14]]
+#init_state = [[1,2,3,4],[5,6,7,8],[10,11,0,12],[9,13,15,14]]
 #init_state = [[12,15,6,10],[4,9,5,8],[14,13,0,2],[1,7,11,3]]
 #init_state = [[14,10,5,13],[11,8,1,3],[2,9,12,6],[15,4,0,7]]
 
-goal_state = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]
+#goal_state = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]
 
 
 # n = 5 cases
