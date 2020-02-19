@@ -63,41 +63,41 @@ class Puzzle(object):
             elif current_node.move == 4:
                 moves.append("DOWN")
             else:
-                raise Exception("Illegal action found in backtrace function: " + action)
+                raise Exception("Illegal action found in backtrace function: " + current_node.move)
             current_node = current_node.parent
         moves.reverse()
         return moves
     
     def move(self, state, action):
         new_state = list(state)
-        index =new_state.index(0)
+        index = new_state.index(0)
         zr = index / self.N
         zc = index % self.N
         if action == 1: # LEFT
             # s(zr,zc) = s(zr, zc+1), s(zr, zc+1) = 0
             if zc < self.N-1:
-                new_state[zr*self.N + zc] = new_state[zr*self.N + zc + 1]
+                new_state[index] = new_state[zr*self.N + zc + 1]
                 new_state[zr*self.N + zc + 1] = 0
             else:
                 return None
         elif action == 2: # RIGHT
             # s(zr,zc) = s(zr, zc-1), s(zr, zc-1) = 0
             if zc >= 1:
-                new_state[zr*self.N + zc] = new_state[zr*self.N + zc - 1]
+                new_state[index] = new_state[zr*self.N + zc - 1]
                 new_state[zr*self.N + zc - 1] = 0
             else:
                 return None
         elif action == 3: # UP
             # s(zr,zc) = s(zr+1, zc), s(zr, zc+1) = 0
             if zr < self.N-1:
-                new_state[zr*self.N + zc] = new_state[(zr+1)*self.N + zc]
+                new_state[index] = new_state[(zr+1)*self.N + zc]
                 new_state[(zr+1)*self.N + zc] = 0
             else:
                 return None
         elif action == 4: # DOWN
             # s(zr,zc) = s(zr-1, zc), s(zr, zc-1) = 0
             if zr >= 1:
-                new_state[zr*self.N + zc] = new_state[(zr-1)*self.N + zc]
+                new_state[index] = new_state[(zr-1)*self.N + zc]
                 new_state[(zr-1)*self.N + zc] = 0
             else:
                 return None

@@ -2,7 +2,6 @@ import os
 import sys
 from heapq import *
 
-
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
         # you may add more attributes if you think is useful
