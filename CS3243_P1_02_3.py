@@ -41,7 +41,16 @@ class PriorityQueue:
     def __len__(self):
         return len(self.queue)
 
+'''
+Node:
+
+Help store info about state
+
+compared by f value.
+
+'''
 class Node:
+    
     def __init__(self, fval, state, parent, move, depth, blank_pos):
         self.fval = fval
         self.parent = parent
@@ -67,6 +76,9 @@ class Node:
     def __ne__(self, obj):
         if obj == None:
             return True
+        if not isinstance(obj, Node):
+            raise Exception("Node compared to a non-node object!")
+        return self.state != obj.state 
             
     
 
@@ -76,6 +88,8 @@ class Puzzle(object):
         self.init_state = self.list_to_tuple(init_state)
         self.goal_state = self.list_to_tuple(goal_state)
         self.goal = None
+
+    ## Helper Functions ##
 
     def list_to_tuple(self, lst):
         return tuple([elem for t in lst for elem in t])
@@ -95,21 +109,12 @@ class Puzzle(object):
             if self.init_state[i] == 0:
                 return i
 
-    def count_inversions(self, state): 
-        n = len(state)
-        inversions = 0
-        for i in range(n):
-            if state[i] == 0:
-                continue
-            for j in range(i + 1, n):
-                if state[j] == 0:
-                    continue
-                if (state[i] > state[j]): 
-                    inversions += 1
-      
-        return inversions
+    #########################
+    
     '''
-    https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
+        Test solvability of puzzle:
+        Idea adapted from https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
+    
     '''
     def solvable(self, state, blank):
         inversions = self.count_inversions(state)
@@ -127,9 +132,23 @@ class Puzzle(object):
                 if inversions % 2 == 1:
                     return False
         return True
+    def count_inversions(self, state): 
+        n = len(state)
+        inversions = 0
+        for i in range(n):
+            if state[i] == 0:
+                continue
+            for j in range(i + 1, n):
+                if state[j] == 0:
+                    continue
+                if (state[i] > state[j]): 
+                    inversions += 1
+      
+        return inversions
         
 
     def solve(self):
+
         blank_position = self.find_blank()
         if not self.solvable(self.init_state, blank_position):
             return ["UNSOLVABLE"]
@@ -138,28 +157,30 @@ class Puzzle(object):
         pq = PriorityQueue()
         seen_states = set()
         seen_states.add(self.init_state)
-        curr_f_val = heuristic(self.init_state)
+        curr_f_val = self.heuristic(self.init_state)
         curr_node = Node(curr_f_val, self.init_state, None, None, 0, blank_position)
         
         while True:        
             for move in moves:
                 if self.is_valid_move(move, curr_node.blank):
                     new_node = self.make_move(move, curr_node)
-                    
-                    #if self.solvable(new_node.state, new_node.blank):
+                
                     if new_node.state not in seen_states:
                         pq.add(new_node)
                         seen_states.add(new_node.state)
-
-            curr_node = pq.poll()  # make best move according to heuristic
-            #self.pretty_print(curr_node.state)
-            if curr_node.fval - curr_node.tree_depth == 0:  # goal reached, since heuristic is 0
+                        
+            # choose state with lowest f value
+            curr_node = pq.poll()  
+            if curr_node.fval - curr_node.tree_depth == 0:
+                # goal reached, since heuristic is 0
                 self.goal = curr_node
                 break
+            
         solution = []
+        # travel from goal node to initial, recording moves.
         while curr_node.parent != None:
             solution.insert(0,curr_node.move)
-            curr_node = curr_node.parent # travel up 
+            curr_node = curr_node.parent  
         return solution
 
     #todo merge validity with making move so no check needed 
@@ -170,17 +191,21 @@ class Puzzle(object):
         blank_row = blank_position // k
         
         if move == left:
-            if blank_column == k-1:  # blank on rightmost column
+            if blank_column == k-1:
+                # blank on rightmost column
                 return False
         elif move == right:
             if blank_column == 0:
-                return False # blank on leftmost column
+                # blank on leftmost column
+                return False 
         elif move == up:
             if blank_row == k-1:
-                return False  # blank on top row
+                # blank on top row
+                return False  
         else:
             if blank_row == 0:
-                return False  # blank on bottom row
+                # blank on bottom row
+                return False  
         return True
 
     def make_move(self, move, curr_node):
@@ -191,59 +216,102 @@ class Puzzle(object):
         blank_row = blank_position // k
         g_n = curr_node.tree_depth + 1
         
-        if move == left: # blank switches place with number to it's right 
+        if move == left:
+            # blank switches place with number to it's right 
             
             new_state[blank_position + 1], new_state[blank_position] = new_state[blank_position], new_state[blank_position + 1]
-            func_value = heuristic(new_state) + g_n
+            func_value = self.heuristic(new_state) + g_n
             new_blank_position = blank_position+1
 
-        elif move == right: # blank switches place with number to it's left 
+        elif move == right:
+            # blank switches place with number to it's left 
             
             new_state[blank_position - 1], new_state[blank_position] = new_state[blank_position], new_state[blank_position - 1]
-            func_value = heuristic(new_state) + g_n
+            func_value = self.heuristic(new_state) + g_n
             new_blank_position = blank_position-1
 
-        elif move == down: # blank switches place with number above it
+        elif move == down:
+            # blank switches place with number above it
             
             new_state[(blank_row-1) * k + blank_column], new_state[blank_position] = new_state[blank_position], new_state[(blank_row-1) * k + blank_column]
-            func_value = heuristic(new_state) + g_n
+            func_value = self.heuristic(new_state) + g_n
             new_blank_position = (blank_row-1) * k + blank_column
 
-        else:   # blank switches place with number below it
+        else:
+            # blank switches place with number below it
             
             new_state[(blank_row+1) * k + blank_column], new_state[blank_position] = new_state[blank_position], new_state[(blank_row+1) * k + blank_column]
-            func_value = heuristic(new_state) + g_n
+            func_value = self.heuristic(new_state) + g_n
             new_blank_position = (blank_row+1) * k + blank_column
 
         new_node = Node(func_value, tuple(new_state), curr_node, move, g_n, new_blank_position)
         return new_node
 
-    def verify_move(self, move, state, blank_position):
+    ## Heuristic ##
+
+    '''
+        Made as a seperate fn so many heuristics can be tried
+
+        Manhattan distance measures the number of moves each tile is away from
+        its correct place on the board
+    '''
+
+    def heuristic(self, state):
+    
+        return self.manhattan_distance(state)
+
+    def manhattan_distance(self, state): 
+        k = self.grid_size
+        total_tile_distance = 0
+        for row in range(k): # row 
+            for col in range(k):  # column
+                curr_tile = state[row*k+col]
+                if curr_tile == 0:
+                    continue
+                if curr_tile%k == 0:
+                    
+                    # account for list indexing, usually should be one row above
+                    correct_row = curr_tile//k - 1
+                    # since k-multiple always on last col
+                    correct_column = k-1 
+                else:
+                    correct_row = curr_tile//k
+                    # account for mod k vs list indexing 
+                    correct_column = curr_tile%k  - 1 
+                
+                num_tiles_away = abs(correct_row - row) + abs(correct_column - col)
+                total_tile_distance += num_tiles_away
+                
+        return total_tile_distance
+
+    ## Verifying correctness of solution ##
+    
+    def make_move_simple(self, move, state, blank_position):
         k = self.grid_size
         new_state = list(state)  
         blank_column = blank_position % k 
         blank_row = blank_position // k
         
-        if move == left: # blank switches place with number to it's right 
-            
+        if move == left:  
+            # blank switches place with number to it's right
             new_state[blank_position + 1], new_state[blank_position] = new_state[blank_position], new_state[blank_position + 1]
             
             new_blank_position = blank_position+1
 
-        elif move == right: # blank switches place with number to it's left 
-            
+        elif move == right: 
+            # blank switches place with number to it's left 
             new_state[blank_position - 1], new_state[blank_position] = new_state[blank_position], new_state[blank_position - 1]
            
             new_blank_position = blank_position-1
 
-        elif move == down: # blank switches place with number above it
-            
+        elif move == down: 
+            # blank switches place with number above it
             new_state[(blank_row-1) * k + blank_column], new_state[blank_position] = new_state[blank_position], new_state[(blank_row-1) * k + blank_column]
            
             new_blank_position = (blank_row-1) * k + blank_column
 
-        else:   # blank switches place with number below it
-            
+        else:   
+            # blank switches place with number below it
             new_state[(blank_row+1) * k + blank_column], new_state[blank_position] = new_state[blank_position], new_state[(blank_row+1) * k + blank_column]
             
             new_blank_position = (blank_row+1) * k + blank_column
@@ -257,38 +325,14 @@ class Puzzle(object):
             blank_pos = self.find_blank()
             for move in moves:
                 self.pretty_print(curr_state)
-                blank_pos, curr_state = self.verify_move(move, curr_state,blank_pos)
+                blank_pos, curr_state = self.make_move_simple(move, curr_state,blank_pos)
 
             self.pretty_print(curr_state)
 
-def heuristic(state):
     
-    return manhattan_distance_1d(state)
-
-def manhattan_distance_1d(state): # works
-    k = int(math.sqrt(len(state)))
-    num_tiles = len(state)- 1
-    total_tile_distance = 0
-
-    for i in range(k): # row 
-        for j in range(k):  # column
-            curr_tile = state[i*k+j]
-            if curr_tile == 0:
-                continue
-            if curr_tile%k == 0:  # multiples of k treated diff
-                correct_row = curr_tile//k - 1 
-                correct_column = k-1 # always on last col
-                num_tiles_away = abs(correct_row - i) + abs(correct_column - j)
-                total_tile_distance += num_tiles_away
-            else:
-                correct_row = curr_tile//k  # quotient of curr_tile/k
-                correct_column = curr_tile%k  - 1 # remainder of curr_tile/k
-                num_tiles_away = abs(correct_row - i) + abs(correct_column - j)
-                total_tile_distance += num_tiles_away
-    return total_tile_distance
 
 
-
+'''
 
 #n = 3 cases
 
@@ -314,8 +358,9 @@ def manhattan_distance_1d(state): # works
 
 #init_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,0,14,15],[16,17,13,18,19],[21,22,23,20,24]]
 #init_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,0,22,23,24]]
-init_state = [[1,3,4,10,5],[7,2,8,0,14],[6,11,12,9,15],[16,17,13,18,19],[21,22,23,24,20]]
-goal_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,0]]
+#init_state = [[1,3,4,10,5],[7,2,8,0,14],[6,11,12,9,15],[16,17,13,18,19],[21,22,23,24,20]]
+#init_state = [[1,3,4,0,10],[7,2,12,8,5],[6,11,13,15,14],[17,23,18,9,19],[16,21,22,24,20]]
+#goal_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,0]]
 
 
 puzzle = Puzzle(init_state, goal_state)
@@ -374,6 +419,4 @@ if __name__ == "__main__":
     with open(sys.argv[2], 'a') as f:
         for answer in ans:
             f.write(answer+'\n')
-
-'''
 
