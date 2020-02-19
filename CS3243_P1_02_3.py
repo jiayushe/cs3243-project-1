@@ -13,9 +13,6 @@ up = "UP"
 
 ######################
 
-## todo
-## change to use node instead of storing solution
-
 ## helper class ##
 
 # simple min heap
@@ -45,12 +42,33 @@ class PriorityQueue:
         return len(self.queue)
 
 class Node:
-    def __init__(self, fval, state, parent, move, depth):
+    def __init__(self, fval, state, parent, move, depth, blank_pos):
         self.fval = fval
         self.parent = parent
         self.move = move
         self.state = state
         self.tree_depth = depth
+        self.blank = blank_pos
+
+    def __cmp__(self, obj):
+        if not isinstance(obj, Node):
+            raise Exception("Node compared to a non-node object!")
+        if self.fval > obj.fval:
+            return 1
+        elif self.fval < obj.fval:
+            return -1
+        else:
+            if self.tree_depth < obj.tree_depth:
+                return -1
+            elif self.tree_depth > obj.tree_depth:
+                return 1
+            else:
+                return 0
+    def __ne__(self, obj):
+        if obj == None:
+            return True
+            
+    
 
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
@@ -62,8 +80,6 @@ class Puzzle(object):
     def list_to_tuple(self, lst):
         return tuple([elem for t in lst for elem in t])
         
-    ## debugging helper function O(K**2) ##
-    ## works ## 
     def pretty_print(self, state): 
         formatted_output = ""
         k = self.grid_size
@@ -79,43 +95,74 @@ class Puzzle(object):
             if self.init_state[i] == 0:
                 return i
 
+    def count_inversions(self, state): 
+        n = len(state)
+        inversions = 0
+        for i in range(n):
+            if state[i] == 0:
+                continue
+            for j in range(i + 1, n):
+                if state[j] == 0:
+                    continue
+                if (state[i] > state[j]): 
+                    inversions += 1
+      
+        return inversions
+    '''
+    https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
+    '''
+    def solvable(self, state, blank):
+        inversions = self.count_inversions(state)
+        if self.grid_size % 2 == 1:  # grid size odd
+            if inversions % 2 == 1:
+                return False
+        else:
+            blank_pos = blank
+            blank_row = blank_pos // self.grid_size
+            row_from_bottom = self.grid_size - blank_row
+            if row_from_bottom % 2 == 0:
+                if inversions % 2 == 0:
+                    return False
+            else:     
+                if inversions % 2 == 1:
+                    return False
+        return True
+        
+
     def solve(self):
+        blank_position = self.find_blank()
+        if not self.solvable(self.init_state, blank_position):
+            return ["UNSOLVABLE"]
         
         moves = [left,right,down,up]
-        k = self.grid_size
-        blank_position = self.find_blank()
         pq = PriorityQueue()
         seen_states = set()
-        curr_state = self.init_state
-        curr_f_val = heuristic(curr_state)
+        seen_states.add(self.init_state)
+        curr_f_val = heuristic(self.init_state)
+        curr_node = Node(curr_f_val, self.init_state, None, None, 0, blank_position)
         
-        while True:
-            
-            if curr_state == self.goal_state:  # home free!
-                break
-            
-            seen_states.add(curr_state) # detect loop
-            
+        while True:        
             for move in moves:
-                
-                if self.is_valid_move(move, blank_position):
+                if self.is_valid_move(move, curr_node.blank):
+                    new_node = self.make_move(move, curr_node)
                     
-                    func_value,new_state,new_moves,new_blank_position = self.make_move(move, curr_state, blank_position)
-                    
-                    if new_state not in seen_states:
-                        pq.add((func_value,new_state,new_blank_position))
+                    #if self.solvable(new_node.state, new_node.blank):
+                    if new_node.state not in seen_states:
+                        pq.add(new_node)
+                        seen_states.add(new_node.state)
 
-            if pq.is_empty():
-                return ["UNSOLVABLE"] 
-            winning_move = pq.poll()
-            curr_state = winning_move[1]  # make best move according to heuristic
-            blank_position = winning_move[3]
-            print(curr_f_val)
-            curr_f_val = winning_move[0]
-            self.pretty_print(curr_state)
-                           
+            curr_node = pq.poll()  # make best move according to heuristic
+            #self.pretty_print(curr_node.state)
+            if curr_node.fval - curr_node.tree_depth == 0:  # goal reached, since heuristic is 0
+                self.goal = curr_node
+                break
+        solution = []
+        while curr_node.parent != None:
+            solution.insert(0,curr_node.move)
+            curr_node = curr_node.parent # travel up 
         return solution
 
+    #todo merge validity with making move so no check needed 
     def is_valid_move(self, move, blank_position): # ensure move generates new state
         
         k = self.grid_size
@@ -136,12 +183,13 @@ class Puzzle(object):
                 return False  # blank on bottom row
         return True
 
-    def make_move(self, move, state, blank_position,past_moves):
+    def make_move(self, move, curr_node):
+        blank_position = curr_node.blank
         k = self.grid_size
-        new_state = list(state)  
+        new_state = list(curr_node.state)  
         blank_column = blank_position % k 
         blank_row = blank_position // k
-        g_n = len(past_moves) + 1
+        g_n = curr_node.tree_depth + 1
         
         if move == left: # blank switches place with number to it's right 
             
@@ -167,8 +215,8 @@ class Puzzle(object):
             func_value = heuristic(new_state) + g_n
             new_blank_position = (blank_row+1) * k + blank_column
 
-        new_moves = past_moves + [move,]
-        return (func_value,tuple(new_state),new_moves,new_blank_position)
+        new_node = Node(func_value, tuple(new_state), curr_node, move, g_n, new_blank_position)
+        return new_node
 
     def verify_move(self, move, state, blank_position):
         k = self.grid_size
@@ -203,13 +251,15 @@ class Puzzle(object):
         return (new_blank_position,new_state)
 
     def verify_solution(self, moves):
-        curr_state = self.init_state
-        blank_pos = self.find_blank()
-        for move in moves:
-            self.pretty_print(curr_state)
-            blank_pos, curr_state = self.verify_move(move, curr_state,blank_pos)
+        if self.goal != None:
+            
+            curr_state = self.init_state
+            blank_pos = self.find_blank()
+            for move in moves:
+                self.pretty_print(curr_state)
+                blank_pos, curr_state = self.verify_move(move, curr_state,blank_pos)
 
-        self.pretty_print(curr_state)
+            self.pretty_print(curr_state)
 
 def heuristic(state):
     
@@ -264,15 +314,14 @@ def manhattan_distance_1d(state): # works
 
 #init_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,0,14,15],[16,17,13,18,19],[21,22,23,20,24]]
 #init_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,0,22,23,24]]
-#goal_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,0]]
+init_state = [[1,3,4,10,5],[7,2,8,0,14],[6,11,12,9,15],[16,17,13,18,19],[21,22,23,24,20]]
+goal_state = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,0]]
 
 
 puzzle = Puzzle(init_state, goal_state)
 ans = puzzle.solve()
 puzzle.verify_solution(ans)
 print ans
-
-
 
 '''
 
@@ -326,8 +375,5 @@ if __name__ == "__main__":
         for answer in ans:
             f.write(answer+'\n')
 
-
-
 '''
-
 
