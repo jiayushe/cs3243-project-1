@@ -24,6 +24,11 @@ fi
 solution="CS3243_P1_02_$1.py"
 timelimit=$2
 
+for i in ./public_tests_p1/*/*.out
+do
+    rm $i
+done
+
 for i in ./public_tests_p1/*/*.txt
 do
     start=`date +%s.%N`
