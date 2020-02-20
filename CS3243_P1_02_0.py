@@ -23,28 +23,57 @@ class Puzzle(object):
         self.goal_position = {} # a map from number to its goal position
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
-        # END linear conflict
         # BEGIN profiling
         self.state_visited_count = 0
         self.max_depth = 0
         # END profiling
 
     def solve(self):
+        if self.is_solvable() == False:
+            return ["UNSOLVABLE"]
         self.AStar()
         res = self.backtrace()
         return res
 
+    def is_solvable(self):
+        state = self.init_state
+        n = len(state)
+        inversions = 0
+        blank = 0
+        for i in range(n):
+            if state[i] == 0:
+                blank = i
+                continue
+            for j in range(i + 1, n):
+                if state[j] == 0:
+                    continue
+                if (state[i] > state[j]):
+                    inversions += 1
+        if self.N % 2 == 1:
+            return inversions % 2 == 0
+        else:
+            row_from_bottom = self.N - blank // self.N - 1
+            return row_from_bottom % 2 == inversions % 2
+
+    def hash(self, state):
+        res = ""
+        for i in state:
+            if i < 10:
+                res += "0"
+            res += str(i)
+        return res
+
     # manhattan
-    def manhattan(self, state):
+    def manhattan_distance(self, state):
         count = 0;
         for i in range(len(state)):
-            goal_X, goal_Y = self.goal_position[state[i]] / self.N, self.goal_position[state[i]] % self.N
-            X, Y = i / self.N, i % self.N
+            goal_X, goal_Y = self.goal_position[state[i]] // self.N, self.goal_position[state[i]] % self.N
+            X, Y = i // self.N, i % self.N
             count += abs(goal_X-X) + abs(goal_Y-Y)
         return count
 
     #linear conflict
-    def linearconflict(self, state):
+    def linear_conflict(self, state):
         count = 0
         for row in range(self.N):
             for k in range(self.N):
@@ -54,32 +83,32 @@ class Puzzle(object):
                     if state[row*self.N + j] == 0:
                         continue
                     # now t_j is guaranteed to be on the same line, right of t_k
-                    goal_pos_j = state[row*self.N + j]
-                    goal_pos_k = state[row*self.N + k]
-                    if (goal_pos_j / self.N == goal_pos_k / self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                    goal_pos_j = self.goal_position[state[row*self.N + j]]
+                    goal_pos_k = self.goal_position[state[row*self.N + k]]
+                    if (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
                         count += 1
-        return count * 2 + self.manhattan(state)
+        return count * 2 + self.manhattan_distance(state)
 
     # misplaced tile count
-    def misplaced(self, state):
+    def misplaced_tile(self, state):
         count = 0
         for i in range(len(self.goal_state)):
             if self.goal_state[i] != state[i]:
-                count = count + 1
+                count += 1
         return count
 
     def AStar(self):
         explored = set()
         heap = list()
 
-        key = self.linearconflict(self.init_state)
+        key = self.linear_conflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
 
         while heap:
             heap_node = heappop(heap)
-            explored.add(heap_node[1].state)
+            explored.add(hash(heap_node[1].state))
 
             if heap_node[1].state == self.goal_state:
                 self.goal_node = heap_node[1]
@@ -88,14 +117,14 @@ class Puzzle(object):
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.linearconflict(neighbor.state)
+                neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
-                if neighbor.state not in explored:
+                if hash(neighbor.state) not in explored:
                     self.state_visited_count += 1
                     if self.max_depth < neighbor.cost:
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
-                    explored.add(neighbor.state)
+                    explored.add(hash(neighbor.state))
     
     def BFS(self):
         explored = set()
@@ -234,10 +263,3 @@ if __name__ == "__main__":
     with open(sys.argv[2], 'a') as f:
         for answer in ans:
             f.write(answer+'\n')
-
-
-
-
-
-
-

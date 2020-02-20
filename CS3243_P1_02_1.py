@@ -158,10 +158,3 @@ if __name__ == "__main__":
     with open(sys.argv[2], 'a') as f:
         for answer in ans:
             f.write(answer+'\n')
-
-
-
-
-
-
-

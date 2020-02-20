@@ -1,6 +1,6 @@
 import os
 import sys
-from heapq import heappush, heappop
+from heapq import heappush, heappop, heapify
 import copy
 import math
 
@@ -78,9 +78,7 @@ class Node:
             return True
         if not isinstance(obj, Node):
             raise Exception("Node compared to a non-node object!")
-        return self.state != obj.state 
-            
-    
+        return self.state != obj.state
 
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
@@ -132,6 +130,7 @@ class Puzzle(object):
                 if inversions % 2 == 1:
                     return False
         return True
+
     def count_inversions(self, state): 
         n = len(state)
         inversions = 0
@@ -143,7 +142,6 @@ class Puzzle(object):
                     continue
                 if (state[i] > state[j]): 
                     inversions += 1
-      
         return inversions
         
     # todo optimise to pass n=4 case 2 and 3 in < 5s
