@@ -20,7 +20,7 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
-        self.goal_position = {} # a map from number to its goal position
+        self.goal_position = [0] * (len(self.init_state)) # a map from number to its goal position
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
         # BEGIN profiling
@@ -67,12 +67,14 @@ class Puzzle(object):
     def manhattan_distance(self, state):
         count = 0;
         for i in range(len(state)):
+            if state[i] == 0:
+                continue
             goal_X, goal_Y = self.goal_position[state[i]] // self.N, self.goal_position[state[i]] % self.N
             X, Y = i // self.N, i % self.N
             count += abs(goal_X-X) + abs(goal_Y-Y)
         return count
 
-    #linear conflict
+    # linear conflict
     def linear_conflict(self, state):
         count = 0
         for row in range(self.N):
@@ -101,7 +103,7 @@ class Puzzle(object):
         explored = set()
         heap = list()
 
-        key = self.linear_conflict(self.init_state)
+        key = self.manhattan_distance(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
@@ -117,7 +119,7 @@ class Puzzle(object):
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
+                neighbor.key = neighbor.cost + self.manhattan_distance(neighbor.state)
                 entry = (neighbor.key, neighbor)
                 if hash(neighbor.state) not in explored:
                     self.state_visited_count += 1
