@@ -142,11 +142,11 @@ class Puzzle(object):
         curr_f_val = self.heuristic(self.init_state)
         
         root = Node(curr_f_val, self.init_state, None, None, 0, blank_position)
-        heappush(heap,(curr_f_val,root))
+        heappush(heap,(curr_f_val,0,root))
         while True:
-            curr_node = heappop(heap)[1]
+            curr_node = heappop(heap)[2]
             while curr_node.tree_depth > upper_bound:
-                curr_node = heappop(heap)[1]
+                curr_node = heappop(heap)[2]
             self.seen_states.add(hash(curr_node.state))
             if curr_node.state == self.goal_state:
                 self.goal = curr_node
@@ -155,7 +155,7 @@ class Puzzle(object):
                 new_node = self.make_move(move,curr_node)
                 if new_node is not None:
                     if hash(new_node.state) not in self.seen_states:
-                        heappush(heap,(new_node.fval, new_node))
+                        heappush(heap,(new_node.fval,new_node.tree_depth, new_node))
                         self.seen_states.add(hash(new_node.state))
                         
         solution = []
@@ -252,16 +252,16 @@ class Puzzle(object):
     def linear_conflict(self, state):
         count = 0
         for row in range(self.grid_size):
-            for k in range(self.N):
-                if state[row*self.N + k] == 0:
+            for k in range(self.grid_size):
+                if state[row*self.grid_size + k] == 0:
                     continue
                 for j in range(k+1, self.grid_size):
-                    if state[row*self.N + j] == 0:
+                    if state[row*self.grid_size + j] == 0:
                         continue
                     # now t_j is guaranteed to be on the same line, right of t_k
-                    goal_pos_j = self.goal_position[state[row*self.N + j]]
-                    goal_pos_k = self.goal_position[state[row*self.N + k]]
-                    if (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                    goal_pos_j = self.goal_position[state[row*self.grid_size + j]]
+                    goal_pos_k = self.goal_position[state[row*self.grid_size + k]]
+                    if (goal_pos_j // self.grid_size == goal_pos_k // self.grid_size) and (goal_pos_j % self.grid_size < goal_pos_k % self.grid_size):
                         count += 1
         return count * 2 + self.manhattan_distance(state)
 
@@ -324,8 +324,8 @@ class Puzzle(object):
 #init_state = [[12,15,6,10],[4,9,5,8],[14,13,0,2],[1,7,11,3]]
 
 #init_state = [[13,5,3,4],[2,1,8,0],[9,15,10,11],[14,12,6,7]]
-init_state = [[9,5,12,4],[0,1,3,10],[14,13,11,2],[15,7,6,8]]
-goal_state = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]
+#init_state = [[9,5,12,4],[0,1,3,10],[14,13,11,2],[15,7,6,8]]
+#goal_state = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]
 
 
 # n = 5 cases
@@ -348,6 +348,7 @@ ans = puzzle.solve()
 t1 = time.time()
 puzzle.verify_solution(ans)
 print ans
+print len(ans)
 print t1-t0
 
 '''
