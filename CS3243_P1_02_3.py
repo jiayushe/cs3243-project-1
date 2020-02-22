@@ -10,44 +10,8 @@ right = "RIGHT"
 down = "DOWN"
 up = "UP"
 
+
 ######################
-
-## helper class ##
-
-# simple min heap
-class PriorityQueue:
-
-    def __init__(self):
-        self.queue = []
-
-    def add(self, item):
-        heappush(self.queue, item)
-
-    def poll(self):
-        return heappop(self.queue)
-
-    def peek(self):
-        return self.queue[0]
-
-    def remove(self, item):
-        value = self.queue.remove(item)
-        heapify(self.queue)
-        return value != None
-
-    def is_empty(self):
-        return self.queue == []
-
-    def __len__(self):
-        return len(self.queue)
-
-'''
-Node:
-
-Help store info about state
-
-compared by f value.
-
-'''
 class Node:
     
     def __init__(self, fval, state, parent, move, depth, blank_pos):
@@ -64,8 +28,6 @@ class Puzzle(object):
         self.init_state = self.list_to_tuple(init_state)
         self.goal_state = self.list_to_tuple(goal_state)
         self.goal = None
-        self.pq = PriorityQueue()
-        self.seen_states = set()
         self.goal_position = {} # a map from number to its goal position
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
@@ -89,12 +51,8 @@ class Puzzle(object):
         for i in range(self.grid_size**2):
             if self.init_state[i] == 0:
                 return i
-    
-    
     def hash(self, state):
         return "".join(map(str,state))
-
-    #########################
     
     '''
         Test solvability of puzzle:
@@ -132,38 +90,46 @@ class Puzzle(object):
         return inversions
         
     def solve(self):
+        
+        ## Init Local Variables ##
+        left = "LEFT"
+        right = "RIGHT"
+        down = "DOWN"
+        up = "UP"
         k = self.grid_size
         upper_bound = k**4
         blank_position = self.find_blank()
-        if not self.is_solvable(self.init_state, blank_position):
-            return ["UNSOLVABLE"]
         heap = []
         moves = [left,right,down,up]
-        curr_f_val = self.heuristic(self.init_state)
+        seen_states = set()
+        ###########################
         
+        if not self.is_solvable(self.init_state, blank_position):
+            return ["UNSOLVABLE"]
+        
+        curr_f_val = self.heuristic(self.init_state)
         root = Node(curr_f_val, self.init_state, None, None, 0, blank_position)
         heappush(heap,(curr_f_val,0,root))
         while True:
             curr_node = heappop(heap)[2]
             while curr_node.tree_depth > upper_bound:
                 curr_node = heappop(heap)[2]
-            self.seen_states.add(hash(curr_node.state))
+            seen_states.add(hash(curr_node.state))
             if curr_node.state == self.goal_state:
                 self.goal = curr_node
                 break
             for move in moves:
                 new_node = self.make_move(move,curr_node)
                 if new_node is not None:
-                    if hash(new_node.state) not in self.seen_states:
-                        heappush(heap,(new_node.fval,new_node.tree_depth, new_node))
-                        self.seen_states.add(hash(new_node.state))
+                    if hash(new_node.state) not in seen_states:
+                        heappush(heap,(new_node.fval, new_node.tree_depth, new_node))
+                        seen_states.add(hash(new_node.state))
                         
         solution = []
-        
-        # travel from goal node to initial, recording moves.
         while curr_node.parent != None:
-            solution.insert(0,curr_node.move)
-            curr_node = curr_node.parent  
+            solution.append(curr_node.move)
+            curr_node = curr_node.parent
+        solution.reverse()
         return solution
 
     def make_move(self, move, curr_node):
@@ -268,6 +234,7 @@ class Puzzle(object):
     ## Verifying correctness of solution ##
     
     def make_move_simple(self, move, state, blank_position):
+        
         k = self.grid_size
         new_state = list(state)  
         blank_column = blank_position % k 
@@ -324,8 +291,8 @@ class Puzzle(object):
 #init_state = [[12,15,6,10],[4,9,5,8],[14,13,0,2],[1,7,11,3]]
 
 #init_state = [[13,5,3,4],[2,1,8,0],[9,15,10,11],[14,12,6,7]]
-#init_state = [[9,5,12,4],[0,1,3,10],[14,13,11,2],[15,7,6,8]]
-#goal_state = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]
+init_state = [[9,5,12,4],[0,1,3,10],[14,13,11,2],[15,7,6,8]]
+goal_state = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]
 
 
 # n = 5 cases
