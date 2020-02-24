@@ -91,7 +91,7 @@ class Puzzle(object):
                     # now t_j is guaranteed to be on the same line, right of t_k
                     goal_pos_j = self.goal_position[state[row*self.N + j]]
                     goal_pos_k = self.goal_position[state[row*self.N + k]]
-                    if (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                    if (goal_pos_j // self.N == row) and (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
                         count += 1
         return count * 2 + self.manhattan_distance(state)
 
@@ -107,7 +107,7 @@ class Puzzle(object):
         explored = set()
         heap = list()
 
-        key = self.manhattan_distance(self.init_state)
+        key = self.linear_conflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
@@ -123,7 +123,7 @@ class Puzzle(object):
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.manhattan_distance(neighbor.state)
+                neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
                 if hash(neighbor.state) not in explored:
                     self.state_visited_count += 1
