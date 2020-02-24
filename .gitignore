@@ -139,4 +139,5 @@ dmypy.json
 .synctex.gz
 
 # output files
+*.in
 *.out

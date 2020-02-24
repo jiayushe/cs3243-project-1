@@ -2,8 +2,7 @@ import os
 import sys
 
 from collections import deque
-from heapq import heappush, heappop, heapify
-import itertools
+from heapq import heappush, heappop
 
 class Node(object):
     def __init__(self, state, parent, move, cost, key):
