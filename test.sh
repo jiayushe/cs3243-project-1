@@ -44,6 +44,7 @@ runtime_arr=()
 
 for i in ./experiment/*.in
 do
+    echo_cyan "> ${i/.txt}"
     start=`date +%s.%N`
     # Spawn a child process.
     python ${solution} $i ${i/.in/.out} 2>&1 1> /dev/null & pid=$!
@@ -55,8 +56,6 @@ do
     kill -9 ${waiter}
     end=`date +%s.%N`
     runtime=$(python -c "print(${end} - ${start})")
-
-    echo_cyan "> ${i/.txt}"
     if [ ${exitcode} -eq 137 ]
     then
         echo "Time limit exceeded (${timelimit} seconds)"

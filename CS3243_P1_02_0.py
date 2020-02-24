@@ -29,9 +29,14 @@ class Puzzle(object):
 
     def solve(self):
         if self.is_solvable() == False:
+            sys.stderr.write("Unsolvable\n")
+            sys.stderr.flush()
             return ["UNSOLVABLE"]
         self.AStar()
         res = self.backtrace()
+        sys.stderr.write("State Visited: " + str(self.state_visited_count) + "\n")
+        sys.stderr.write("Max Depth: " + str(self.max_depth) + "\n")
+        sys.stderr.flush()
         return res
 
     def is_solvable(self):
