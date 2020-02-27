@@ -2,7 +2,7 @@ import os
 import sys
 
 from collections import deque
-from heapq import heappush, heappop
+from heapq import heappush, heappop, heapify
 
 class Node(object):
     def __init__(self, state, parent, move, cost, key):
@@ -106,14 +106,17 @@ class Puzzle(object):
     def AStar(self):
         explored = set()
         heap = list()
+        frontier_map = dict() # map from hash(state) to entry
 
         key = self.linear_conflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
+        frontier_map[hash(root.state)] = entry
 
         while heap:
             heap_node = heappop(heap)
+            frontier_map.pop(hash(heap_node[1].state))
             explored.add(hash(heap_node[1].state))
 
             if heap_node[1].state == self.goal_state:
@@ -125,12 +128,19 @@ class Puzzle(object):
             for neighbor in neighbors:
                 neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
-                if hash(neighbor.state) not in explored:
+                if hash(neighbor.state) not in explored and hash(neighbor.state) not in frontier_map:
                     self.state_visited_count += 1
                     if self.max_depth < neighbor.cost:
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
-                    explored.add(hash(neighbor.state))
+                    frontier_map[hash(neighbor.state)] = entry
+                elif hash(neighbor.state) in frontier_map and frontier_map[hash(neighbor.state)][1].cost > neighbor.cost:
+                    sys.stderr.write("re-heapify")
+                    sys.stderr.flush()
+                    heap.remove(frontier_map[hash(neighbor.state)])
+                    heapify(heap)
+                    heappush(heap, entry)
+                    frontier_map[hash(neighbor.state)] = entry
     
     def BFS(self):
         explored = set()
