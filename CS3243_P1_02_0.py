@@ -2,7 +2,7 @@ import os
 import sys
 
 from collections import deque
-from heapq import heappush, heappop, heapify
+from heapq import heappush, heappop
 
 class Node(object):
     def __init__(self, state, parent, move, cost, key):
@@ -106,16 +106,18 @@ class Puzzle(object):
     def AStar(self):
         explored = set()
         heap = list()
+        frontier_cost = dict()
 
         key = self.linear_conflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
-        frontier_set = set([hash(root.state)])
+        frontier_cost[hash(root.state)] = root.cost
 
         while heap:
             heap_node = heappop(heap)
-            frontier_set.remove(hash(heap_node[1].state))
+            if hash(heap_node[1].state) in frontier_cost and frontier_cost[hash(heap_node[1].state)] < heap_node[1].cost:
+                continue
             explored.add(hash(heap_node[1].state))
 
             if heap_node[1].state == self.goal_state:
@@ -127,12 +129,16 @@ class Puzzle(object):
             for neighbor in neighbors:
                 neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
-                if hash(neighbor.state) not in explored and hash(neighbor.state) not in frontier_set:
+                hashed_neighbor_state = hash(neighbor.state)
+                if hashed_neighbor_state not in explored and hashed_neighbor_state not in frontier_cost:
                     self.state_visited_count += 1
                     if self.max_depth < neighbor.cost:
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
-                    frontier_set.add(hash(neighbor.state))
+                    explored.add(hashed_neighbor_state)
+                elif hashed_neighbor_state in frontier_cost and frontier_cost[hashed_neighbor_state] > neighbor.cost:
+                    heappush(heap, entry)
+                    frontier_cost[hashed_neighbor_state] = neighbor.cost
     
     def BFS(self):
         explored = set()
