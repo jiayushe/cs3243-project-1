@@ -117,10 +117,11 @@ class Puzzle(object):
         while heap:
             heap_node = heappop(heap)
             if hash(heap_node[1].state) in frontier_cost and frontier_cost[hash(heap_node[1].state)] < heap_node[1].cost:
+                # lazy deletion: if the popped node has a worse cost than recorded, it's a replaced node, ignore it
                 continue
-            explored.add(hash(heap_node[1].state))
+            explored.add(hash(heap_node[1].state)) # add ONLY explored node to the explored set
 
-            if heap_node[1].state == self.goal_state:
+            if heap_node[1].state == self.goal_state: # run goal test ONLY on explored node
                 self.goal_node = heap_node[1]
                 return heap
 
@@ -131,12 +132,14 @@ class Puzzle(object):
                 entry = (neighbor.key, neighbor)
                 hashed_neighbor_state = hash(neighbor.state)
                 if hashed_neighbor_state not in explored and hashed_neighbor_state not in frontier_cost:
+                    # if the child isn't in explored set or the frontier, add it to the frontier
                     self.state_visited_count += 1
                     if self.max_depth < neighbor.cost:
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
-                    explored.add(hashed_neighbor_state)
+                    frontier_cost[hashed_neighbor_state] = neighbor.cost
                 elif hashed_neighbor_state in frontier_cost and frontier_cost[hashed_neighbor_state] > neighbor.cost:
+                    # if the child state is already in the frontier, replace the node in frontier if the cost is bettre
                     heappush(heap, entry)
                     frontier_cost[hashed_neighbor_state] = neighbor.cost
     
