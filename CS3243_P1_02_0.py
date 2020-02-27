@@ -23,6 +23,7 @@ class Puzzle(object):
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
         # BEGIN profiling
+        self.state_explored_count = 0
         self.state_visited_count = 0
         self.max_heap_size = 0
         self.max_depth = 0
@@ -35,9 +36,11 @@ class Puzzle(object):
             return ["UNSOLVABLE"]
         self.AStar()
         res = self.backtrace()
-        sys.stderr.write("State Visited: " + str(self.state_visited_count) + "\n")
+        sys.stderr.write("Solution Depth: " + str(self.goal_node.cost) + "\n")
+        sys.stderr.write("Max Search Depth: " + str(self.max_depth) + "\n")
+        sys.stderr.write("State Explored: " + str(self.state_explored_count) + "\n")
+        sys.stderr.write("State Generated: " + str(self.state_visited_count) + "\n")
         sys.stderr.write("Max Heap Size: " + str(self.max_heap_size) + "\n")
-        sys.stderr.write("Max Depth: " + str(self.max_depth) + "\n")
         sys.stderr.flush()
         return res
 
@@ -122,6 +125,7 @@ class Puzzle(object):
             if hash(heap_node[1].state) in frontier_cost and frontier_cost[hash(heap_node[1].state)] < heap_node[1].cost:
                 # lazy deletion: if the popped node has a worse cost than recorded, it's a replaced node, ignore it
                 continue
+            self.state_explored_count += 1
             explored.add(hash(heap_node[1].state)) # add ONLY explored node to the explored set
 
             if heap_node[1].state == self.goal_state: # run goal test ONLY on explored node
