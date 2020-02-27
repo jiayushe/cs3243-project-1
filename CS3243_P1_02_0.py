@@ -24,6 +24,7 @@ class Puzzle(object):
             self.goal_position[self.goal_state[i]] = i
         # BEGIN profiling
         self.state_visited_count = 0
+        self.max_heap_size = 0
         self.max_depth = 0
         # END profiling
 
@@ -35,6 +36,7 @@ class Puzzle(object):
         self.AStar()
         res = self.backtrace()
         sys.stderr.write("State Visited: " + str(self.state_visited_count) + "\n")
+        sys.stderr.write("Max Heap Size: " + str(self.max_heap_size) + "\n")
         sys.stderr.write("Max Depth: " + str(self.max_depth) + "\n")
         sys.stderr.flush()
         return res
@@ -115,6 +117,7 @@ class Puzzle(object):
         frontier_cost[hash(root.state)] = root.cost
 
         while heap:
+            self.max_heap_size = max(self.max_heap_size, len(heap))
             heap_node = heappop(heap)
             if hash(heap_node[1].state) in frontier_cost and frontier_cost[hash(heap_node[1].state)] < heap_node[1].cost:
                 # lazy deletion: if the popped node has a worse cost than recorded, it's a replaced node, ignore it
