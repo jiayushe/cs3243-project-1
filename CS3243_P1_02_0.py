@@ -148,19 +148,18 @@ class Puzzle(object):
     
     def BFS(self):
         explored = set()
-        frontier = deque([Node(self.init_state, None, None, 0, 0)])
+        frontier = deque([Node(self.init_state, None, None)])
 
         while frontier:
             node = frontier.popleft()
             explored.add(node.state)
 
-            if node.state == self.goal_state:
-                self.goal_node = node
-                return frontier
-
             neighbors = self.expand(node)
             for neighbor in neighbors:
                 if neighbor.state not in explored:
+                    if neighbor.state == self.goal_state:
+                        self.goal_node = node
+                        return frontier
                     frontier.append(neighbor)
                     explored.add(neighbor.state)
 
