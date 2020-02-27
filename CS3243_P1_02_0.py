@@ -106,17 +106,16 @@ class Puzzle(object):
     def AStar(self):
         explored = set()
         heap = list()
-        frontier_map = dict() # map from hash(state) to entry
 
         key = self.linear_conflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
-        frontier_map[hash(root.state)] = entry
+        frontier_set = set([hash(root.state)])
 
         while heap:
             heap_node = heappop(heap)
-            frontier_map.pop(hash(heap_node[1].state))
+            frontier_set.remove(hash(heap_node[1].state))
             explored.add(hash(heap_node[1].state))
 
             if heap_node[1].state == self.goal_state:
@@ -128,19 +127,12 @@ class Puzzle(object):
             for neighbor in neighbors:
                 neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
-                if hash(neighbor.state) not in explored and hash(neighbor.state) not in frontier_map:
+                if hash(neighbor.state) not in explored and hash(neighbor.state) not in frontier_set:
                     self.state_visited_count += 1
                     if self.max_depth < neighbor.cost:
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
-                    frontier_map[hash(neighbor.state)] = entry
-                elif hash(neighbor.state) in frontier_map and frontier_map[hash(neighbor.state)][1].cost > neighbor.cost:
-                    sys.stderr.write("re-heapify")
-                    sys.stderr.flush()
-                    heap.remove(frontier_map[hash(neighbor.state)])
-                    heapify(heap)
-                    heappush(heap, entry)
-                    frontier_map[hash(neighbor.state)] = entry
+                    frontier_set.add(hash(neighbor.state))
     
     def BFS(self):
         explored = set()
