@@ -15,11 +15,17 @@ class Node(object):
         self.key = key
 
 class Puzzle(object):
-    def __init__(self, init_state, goal_state, heuristic="linear_conflict"):
+    def __init__(self, init_state, goal_state, heuristic="linear_conflict", generated=False):
         # you may add more attributes if you think is useful
-        self.init_state = self.list_to_tuple(init_state)
+        if not generated:
+            self.init_state = self.list_to_tuple(init_state)
+        else:
+            self.init_state = init_state
         self.goal_state = self.list_to_tuple(goal_state)
-        self.N = len(init_state)
+        if not generated:
+            self.N = len(init_state)
+        else:
+            self.N = int(len(init_state) ** 0.5)
         self.goal_node = None
         self.goal_position = [0] * (len(self.init_state)) # a map from number to its goal position
         for i in range(len(self.goal_state)):
@@ -348,74 +354,101 @@ def generate_puzzle(n, step):
 if __name__ == "__main__":
 
     f = open("./experiment_result.txt", "w")
+    goal_states = [[[1, 2, 3], [4, 5, 6], [7, 8, 0]],
+    [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]],
+    [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 0]]]
 
     # Run public tests
-    public_test_3_result = []
-    public_test_4_result = []
-    public_test_5_result = []
+    # public_test_3_result = []
+    # public_test_4_result = []
+    # public_test_5_result = []
 
-    print("Running public tests on n=3")
-    print("----------------------------")
-    goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
-    count = 0
-    for init_state in public_test_3:
-        count = count + 1
-        puzzle = Puzzle(init_state, goal_state)
-        start_time = time.time()
-        res = puzzle.solve()
-        if res["result"] != ["UNSOLVABLE"]:
-            print_result(res)
-        else:
-            print("UNSOLVABLE")
-        time_taken = time.time() - start_time
-        print("--- %s seconds ---" % (time_taken))
-        res["time"] = time_taken
-        public_test_3_result.append(res)
-    print("")
+    # print("Running public tests on n=3")
+    # print("----------------------------")
+    # goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+    # count = 0
+    # for init_state in public_test_3:
+    #     count = count + 1
+    #     puzzle = Puzzle(init_state, goal_state)
+    #     start_time = time.time()
+    #     res = puzzle.solve()
+    #     if res["result"] != ["UNSOLVABLE"]:
+    #         print_result(res)
+    #     else:
+    #         print("UNSOLVABLE")
+    #     time_taken = time.time() - start_time
+    #     print("--- %s seconds ---" % (time_taken))
+    #     res["time"] = time_taken
+    #     public_test_3_result.append(res)
+    # print("")
 
-    print("Running public tests on n=4")
-    print("----------------------------")
-    goal_state = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]
-    count = 0
-    for init_state in public_test_4:
-        count = count + 1
-        puzzle = Puzzle(init_state, goal_state)
-        start_time = time.time()
-        res = puzzle.solve()
-        if res["result"] != ["UNSOLVABLE"]:
-            print_result(res)
-        else:
-            print("UNSOLVABLE")
-        time_taken = time.time() - start_time
-        print("--- %s seconds ---" % (time_taken))
-        res["time"] = time_taken
-        public_test_4_result.append(res)
-    print("")
+    # print("Running public tests on n=4")
+    # print("----------------------------")
+    # goal_state = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]
+    # count = 0
+    # for init_state in public_test_4:
+    #     count = count + 1
+    #     puzzle = Puzzle(init_state, goal_state)
+    #     start_time = time.time()
+    #     res = puzzle.solve()
+    #     if res["result"] != ["UNSOLVABLE"]:
+    #         print_result(res)
+    #     else:
+    #         print("UNSOLVABLE")
+    #     time_taken = time.time() - start_time
+    #     print("--- %s seconds ---" % (time_taken))
+    #     res["time"] = time_taken
+    #     public_test_4_result.append(res)
+    # print("")
 
-    print("Running public tests on n=5")
-    print("----------------------------")
-    goal_state = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 0]]
-    count = 0
-    for init_state in public_test_5:
-        count = count + 1
-        puzzle = Puzzle(init_state, goal_state)
-        start_time = time.time()
-        res = puzzle.solve()
-        if res["result"] != ["UNSOLVABLE"]:
-            print_result(res)
-        else:
-            print("UNSOLVABLE")
-        time_taken = time.time() - start_time
-        print("--- %s seconds ---" % (time_taken))
-        res["time"] = time_taken
-        public_test_5_result.append(res)
-    print("")
-    f.write("public test cases\n")
-    f.write("n=3\n")
-    f.write(str(public_test_3_result)+"\n")
-    f.write("n=4\n")
-    f.write(str(public_test_4_result)+"\n")
-    f.write("n=5\n")
-    f.write(str(public_test_5_result)+"\n")
+    # print("Running public tests on n=5")
+    # print("----------------------------")
+    # goal_state = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 0]]
+    # count = 0
+    # for init_state in public_test_5:
+    #     count = count + 1
+    #     puzzle = Puzzle(init_state, goal_state)
+    #     start_time = time.time()
+    #     res = puzzle.solve()
+    #     if res["result"] != ["UNSOLVABLE"]:
+    #         print_result(res)
+    #     else:
+    #         print("UNSOLVABLE")
+    #     time_taken = time.time() - start_time
+    #     print("--- %s seconds ---" % (time_taken))
+    #     res["time"] = time_taken
+    #     public_test_5_result.append(res)
+    # print("")
+    # f.write("public test cases\n")
+    # f.write("n=3\n")
+    # f.write(str(public_test_3_result)+"\n")
+    # f.write("n=4\n")
+    # f.write(str(public_test_4_result)+"\n")
+    # f.write("n=5\n")
+    # f.write(str(public_test_5_result)+"\n")
 
-    print(generate_puzzle(5, 100))
+    # Generate random tests
+    random_step = 100
+    random_case = 50
+    for n in range(3,6):
+        print("Random test: n=" + str(n))
+        goal_state = goal_states[n-3]
+        total_time = 0
+        total_solution_depth = 0
+        total_max_search_depth = 0
+        total_state_explored = 0
+        total_node_generated = 0
+        total_max_heap_size = 0
+        for i in range(random_case):
+            puzzle = Puzzle(generate_puzzle(n, random_step), goal_state, generated=True)
+            start_time = time.time()
+            res = puzzle.solve()
+            res["time"] = time.time() - start_time
+            total_time += res["time"]
+            if res.get("solution_depth"):
+                total_solution_depth += res["solution_depth"]
+                total_max_search_depth += res["max_search_depth"]
+                total_state_explored += res["state_explored"]
+                total_node_generated += res["node_generated"]
+                total_max_heap_size += res["max_heap_size"]
+        print("Average time: " + str(total_time / random_case))
