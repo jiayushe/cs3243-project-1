@@ -15,6 +15,26 @@ def kill(process):
     except OSError: 
         pass
 
+def is_solvable(state):
+        n = len(state)
+        dimension = n ** 0.5
+        inversions = 0
+        blank = 0
+        for i in range(n):
+            if state[i] == 0:
+                blank = i
+                continue
+            for j in range(i + 1, n):
+                if state[j] == 0:
+                    continue
+                if (state[i] > state[j]):
+                    inversions += 1
+        if dimension % 2 == 1:
+            return inversions % 2 == 0
+        else:
+            row_from_bottom = dimension - blank // dimension - 1
+            return row_from_bottom % 2 == inversions % 2
+
 def generate_input(dimension, sample_size):
     if os.path.exists('./experiment'):
         os.system("rm -rf ./experiment")
@@ -25,6 +45,8 @@ def generate_input(dimension, sample_size):
     for cnt in range(0, sample_size):
         random_list = [i for i in range(0, max_num)]
         random.shuffle(random_list)
+        while is_solvable(random_list) == False:
+            random.shuffle(random_list)
         random_state = [[0 for i in range(dimension)] for j in range(dimension)]
         for i in range(0, max_num):
             random_state[i//dimension][i%dimension] = random_list[i]
