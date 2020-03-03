@@ -15,39 +15,80 @@ def kill(process):
     except OSError: 
         pass
 
-def is_solvable(state):
-    n = len(state)
-    dimension = n ** 0.5
-    inversions = 0
-    blank = 0
-    for i in range(n):
-        if state[i] == 0:
-            blank = i
-            continue
-        for j in range(i + 1, n):
-            if state[j] == 0:
-                continue
-            if (state[i] > state[j]):
-                inversions += 1
-    if dimension % 2 == 1:
-        return inversions % 2 == 0
-    else:
-        row_from_bottom = dimension - blank // dimension - 1
-        return row_from_bottom % 2 == inversions % 2
-
 def init():
     if os.path.exists('./experiment'):
         os.system('rm -rf ./experiment')
     os.mkdir('./experiment')
 
+def is_valid_action(n, state, action):
+    index = state.index(0)
+    zr = index / n
+    zc = index % n
+    if action == "LEFT":
+        return zc < n-1
+    elif action == "RIGHT":
+        return zc >= 1
+    elif action == "UP":
+        return zr < n-1
+    else:
+        return zr >= 1
+
+def number_to_move(move):
+    if move == 1:
+        return "LEFT"
+    elif move == 2:
+        return "RIGHT"
+    elif move == 3:
+        return "UP"
+    else:
+        return "DOWN"
+
+def move(N, state, action):
+    new_state = list(state)
+    index = new_state.index(0)
+    zr = index / N
+    zc = index % N
+    if action == 1: # LEFT
+        new_state[index] = new_state[zr*N + zc + 1]
+        new_state[zr*N + zc + 1] = 0
+    elif action == 2: # RIGHT
+        new_state[index] = new_state[zr*N + zc - 1]
+        new_state[zr*N + zc - 1] = 0
+    elif action == 3: # UP
+        new_state[index] = new_state[(zr+1)*N + zc]
+        new_state[(zr+1)*N + zc] = 0
+    elif action == 4: # DOWN
+        new_state[index] = new_state[(zr-1)*N + zc]
+        new_state[(zr-1)*N + zc] = 0
+    else:
+        raise Exception("Illegal action found in move function: " + action)
+    return tuple(new_state)
+
+def generate_puzzle(n):
+    init_state = None
+    if n == 3:
+        init_state = (1, 2, 3, 4, 5, 6, 7, 8, 0)
+    elif n == 4:
+        init_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)
+    elif n == 5:
+        init_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)
+    else:
+        raise Exception("exception at generate_puzzle")
+    cur_state = init_state
+    for i in range(100):
+        r = random.randrange(4)+1
+        action = number_to_move(r)
+        while not is_valid_action(n, cur_state, action):
+            r = random.randrange(4)+1
+            action = number_to_move(r)
+        cur_state = move(n, cur_state, r)
+    return cur_state
+
 def generate_input(dimension, sample_size, prefix):
     max_num = dimension ** 2
 
     for cnt in range(0, sample_size):
-        random_list = [i for i in range(0, max_num)]
-        random.shuffle(random_list)
-        while is_solvable(random_list) == False:
-            random.shuffle(random_list)
+        random_list = generate_puzzle(dimension)
         random_state = [[0 for i in range(dimension)] for j in range(dimension)]
         for i in range(0, max_num):
             random_state[i//dimension][i%dimension] = random_list[i]
