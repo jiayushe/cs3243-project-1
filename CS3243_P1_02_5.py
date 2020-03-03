@@ -35,11 +35,12 @@ def is_solvable(state):
         row_from_bottom = dimension - blank // dimension - 1
         return row_from_bottom % 2 == inversions % 2
 
-def generate_input(dimension, sample_size, prefix):
+def init():
     if os.path.exists('./experiment'):
         os.system('rm -rf ./experiment')
     os.mkdir('./experiment')
 
+def generate_input(dimension, sample_size, prefix):
     max_num = dimension ** 2
 
     for cnt in range(0, sample_size):
@@ -62,16 +63,26 @@ def generate_input(dimension, sample_size, prefix):
                 f.write('\n')
 
 def mean(lst):
+    if len(lst) == 0:
+        return 0
     return sum(lst) / len(lst)
 
 def stdev(lst):
+    if len(lst) == 0:
+        return 0
     m = mean(lst)
     res = 0
     for i in lst:
         res += (i - m) ** 2
     return (res / len(lst)) ** 0.5
 
+def maximum(lst):
+    if len(lst) == 0:
+        return 0
+    return max(lst)
+
 if __name__ == '__main__':
+    init()
     random.seed(1)
     time_limit = 60
     sample_size = 10
@@ -107,4 +118,4 @@ if __name__ == '__main__':
             echo_cyan('Standard Deviation:')
             sys.stdout.write(str(stdev(runtime_arr)) + 's\n')
             echo_cyan('Max Runtime:')
-            sys.stdout.write(str(max(runtime_arr)) + 's\n')
+            sys.stdout.write(str(maximum(runtime_arr)) + 's\n')

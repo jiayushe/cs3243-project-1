@@ -2,12 +2,15 @@ import os
 import sys
 
 from collections import deque
+from heapq import heappush, heappop
 
 class Node(object):
-    def __init__(self, state, parent, move):
+    def __init__(self, state, parent, move, cost, key):
         self.state = state
         self.parent = parent
         self.move = move
+        self.cost = cost
+        self.key = key
 
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
@@ -15,6 +18,9 @@ class Puzzle(object):
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
         self.goal_node = None
+        self.goal_position = [0] * (len(self.init_state)) # a map from number to its goal position
+        for i in range(len(self.goal_state)):
+            self.goal_position[self.goal_state[i]] = i
         # BEGIN profiling
         self.state_explored_count = 0
         self.state_visited_count = 0
@@ -27,16 +33,16 @@ class Puzzle(object):
             sys.stderr.write("Unsolvable\n")
             sys.stderr.flush()
             return ["UNSOLVABLE"]
-        self.BFS()
+        self.AStar()
         res = self.backtrace()
-        sys.stderr.write("Solution Depth: " + str(len(res)) + "\n")
-        sys.stderr.write("Max Search Depth: " + str(len(res)) + "\n")
+        sys.stderr.write("Solution Depth: " + str(self.goal_node.cost) + "\n")
+        sys.stderr.write("Max Search Depth: " + str(self.max_depth) + "\n")
         sys.stderr.write("State Explored: " + str(self.state_explored_count) + "\n")
         sys.stderr.write("State Generated: " + str(self.state_visited_count) + "\n")
         sys.stderr.write("Max Heap Size: " + str(self.max_heap_size) + "\n")
         sys.stderr.flush()
         return res
-    
+
     def is_solvable(self):
         state = self.init_state
         n = len(state)
@@ -57,38 +63,74 @@ class Puzzle(object):
             row_from_bottom = self.N - blank // self.N - 1
             return row_from_bottom % 2 == inversions % 2
 
-    def BFS(self):
-        explored = set()
-        frontier = deque()
-        root = Node(self.init_state, None, None)
-        self.state_visited_count += 1
-        self.state_explored_count += 1
-        explored.add(root.state)
-        if root.state == self.goal_state:
-            self.goal_node = root
-            return
-        frontier.append(root)
+    def hash(self, state):
+        res = ""
+        for i in state:
+            if i < 10:
+                res += "0"
+            res += str(i)
+        return res
 
-        while frontier:
-            self.max_heap_size = max(self.max_heap_size, len(frontier))
-            node = frontier.popleft()
-            neighbors = self.expand(node)
+    # misplaced tile
+    def misplaced_tile(self, state):
+        count = 0
+        for i in range(len(self.goal_state)):
+            if self.goal_state[i] != state[i]:
+                count += 1
+        return count
+
+    def heuristic(self, state):
+        return self.misplaced_tile(state)
+
+    def AStar(self):
+        explored = set()
+        heap = list()
+        frontier_cost = dict()
+
+        key = self.heuristic(self.init_state)
+        root = Node(self.init_state, None, None, 0, key)
+        entry = (key, root)
+        self.state_visited_count += 1
+        heappush(heap, entry)
+        frontier_cost[hash(root.state)] = root.cost
+
+        while heap:
+            self.max_heap_size = max(self.max_heap_size, len(heap))
+            heap_node = heappop(heap)
+            if hash(heap_node[1].state) in frontier_cost and frontier_cost[hash(heap_node[1].state)] < heap_node[1].cost:
+                # lazy deletion: if the popped node has a worse cost than recorded, it's a replaced node, ignore it
+                continue
+            self.state_explored_count += 1
+            explored.add(hash(heap_node[1].state)) # add ONLY explored node to the explored set
+
+            if heap_node[1].state == self.goal_state: # run goal test ONLY on explored node
+                self.goal_node = heap_node[1]
+                return
+
+            neighbors = self.expand(heap_node[1])
+
             for neighbor in neighbors:
-                if neighbor.state not in explored:
+                neighbor.key = neighbor.cost + self.heuristic(neighbor.state)
+                entry = (neighbor.key, neighbor)
+                hashed_neighbor_state = hash(neighbor.state)
+                if hashed_neighbor_state not in explored and hashed_neighbor_state not in frontier_cost:
+                    # if the child isn't in explored set or the frontier, add it to the frontier
                     self.state_visited_count += 1
-                    self.state_explored_count += 1
-                    explored.add(neighbor.state)
-                    if neighbor.state == self.goal_state:
-                        self.goal_node = neighbor
-                        return
-                    frontier.append(neighbor)
+                    if self.max_depth < neighbor.cost:
+                        self.max_depth = neighbor.cost
+                    heappush(heap, entry)
+                    frontier_cost[hashed_neighbor_state] = neighbor.cost
+                elif hashed_neighbor_state in frontier_cost and frontier_cost[hashed_neighbor_state] > neighbor.cost:
+                    # if the child state is already in the frontier, replace the node in frontier if the cost is bettre
+                    heappush(heap, entry)
+                    frontier_cost[hashed_neighbor_state] = neighbor.cost
 
     def expand(self, node):
         neighbors = list()
-        neighbors.append(Node(self.move(node.state, 1), node, 1))
-        neighbors.append(Node(self.move(node.state, 2), node, 2))
-        neighbors.append(Node(self.move(node.state, 3), node, 3))
-        neighbors.append(Node(self.move(node.state, 4), node, 4))
+        neighbors.append(Node(self.move(node.state, 1), node, 1, node.cost+1, 0))
+        neighbors.append(Node(self.move(node.state, 2), node, 2, node.cost+1, 0))
+        neighbors.append(Node(self.move(node.state, 3), node, 3, node.cost+1, 0))
+        neighbors.append(Node(self.move(node.state, 4), node, 4, node.cost+1, 0))
         return [neighbor for neighbor in neighbors if neighbor.state]
     
     def backtrace(self):

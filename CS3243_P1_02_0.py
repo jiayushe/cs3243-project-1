@@ -14,7 +14,6 @@ class Node(object):
 
 class Puzzle(object):
     def __init__(self, init_state, goal_state):
-        # you may add more attributes if you think is useful
         self.init_state = self.list_to_tuple(init_state)
         self.goal_state = self.list_to_tuple(goal_state)
         self.N = len(init_state)
@@ -72,7 +71,15 @@ class Puzzle(object):
             res += str(i)
         return res
 
-    # manhattan
+    # misplaced tile
+    def misplaced_tile(self, state):
+        count = 0
+        for i in range(len(self.goal_state)):
+            if self.goal_state[i] != state[i]:
+                count += 1
+        return count
+
+    # manhattan distance
     def manhattan_distance(self, state):
         count = 0;
         for i in range(len(state)):
@@ -100,22 +107,18 @@ class Puzzle(object):
                         count += 1
         return count * 2 + self.manhattan_distance(state)
 
-    # misplaced tile count
-    def misplaced_tile(self, state):
-        count = 0
-        for i in range(len(self.goal_state)):
-            if self.goal_state[i] != state[i]:
-                count += 1
-        return count
+    def heuristic(self, state):
+        return self.linear_conflict(state)
 
     def AStar(self):
         explored = set()
         heap = list()
         frontier_cost = dict()
 
-        key = self.linear_conflict(self.init_state)
+        key = self.heuristic(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
+        self.state_visited_count += 1
         heappush(heap, entry)
         frontier_cost[hash(root.state)] = root.cost
 
@@ -130,12 +133,12 @@ class Puzzle(object):
 
             if heap_node[1].state == self.goal_state: # run goal test ONLY on explored node
                 self.goal_node = heap_node[1]
-                return heap
+                return
 
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
+                neighbor.key = neighbor.cost + self.heuristic(neighbor.state)
                 entry = (neighbor.key, neighbor)
                 hashed_neighbor_state = hash(neighbor.state)
                 if hashed_neighbor_state not in explored and hashed_neighbor_state not in frontier_cost:
@@ -149,23 +152,6 @@ class Puzzle(object):
                     # if the child state is already in the frontier, replace the node in frontier if the cost is bettre
                     heappush(heap, entry)
                     frontier_cost[hashed_neighbor_state] = neighbor.cost
-    
-    def BFS(self):
-        explored = set()
-        frontier = deque([Node(self.init_state, None, None)])
-
-        while frontier:
-            node = frontier.popleft()
-            explored.add(node.state)
-
-            neighbors = self.expand(node)
-            for neighbor in neighbors:
-                if neighbor.state not in explored:
-                    if neighbor.state == self.goal_state:
-                        self.goal_node = node
-                        return frontier
-                    frontier.append(neighbor)
-                    explored.add(neighbor.state)
 
     def expand(self, node):
         neighbors = list()
