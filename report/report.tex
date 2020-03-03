@@ -20,10 +20,11 @@ We model the K-Puzzle Problem as follows:
 \section{Technical Analysis}
 All of our search algorithms are graph-search, meaning when adding nodes to the frontier, we won’t re-add nodes that appeared in the \emph{explored} set. And we adopt the following convention for notations:
 \begin{itemize}
+    \item $n'$: successor of node n. 
 	\item $g(n)$: cost of reaching $n$ from start node.
 	\item $h(n)$: estimated cost \textbf{from} $n$ to goal.
 	\item $f(n)$: estimated cost of cheapest path \textbf{through} $n$ to goal.
-	\item $c(a,b)$: step cost from node $a$ to $b$.
+	\item $c(n,n')$: step cost from node $a$ to $b$.
 \end{itemize}
 
 \subsection{Uninformed search - Breadth-first Search (BFS)}
@@ -67,80 +68,112 @@ Space complexity: $O(b^m)$
 \subsection{Heuristic - Manhattan Distance}
 \subsection{Heuristic - Misplaced Tiles}
 \subsection{Heuristic - Linear Conflict}
-We partition the proof of consistency into 2 parts:
-Since there are at most 4 successors of each node n, we partition the proof into when he action is along the row (left/right successors) and along the column, (up/down successors) \\
 
+\textbf{Definition:}
+Two tiles $t_j$ and $t_k$ are in a linear conflict 
+if $t_j$ and $t_k$ are in the same line, the goal positions of $t_j$ and $t_k$ 
+are both in that line, $t_j$ is to the right of $t_k$, and the goal position of $t_j$
+is to the left of the goal position of $t_k$. \\
+Then the Linear conflict heuristic is given by $h(n) = LC(n) + MD(n)$ where $MD(n)=\sum md(n,t_j)$, is the manhattan distance of the state, the sum of individual manhattan distances. $LC(n) = 2[\sum(lc(n,r_i) +lc(n,c_j)]$ is the 2 times the sum of linear conflicts in the rows and columns. \\
 We assume that the Manhattan Distance is consistent.\\
-
-Let us first consider the successors obtained by moving along the row $r_i$ of the K-Puzzle. We observe that since along $r_i$, tile x is merely swapping places with a
-blank tile, it will not cause any change to the linear conflicts of that row.
-
-WLOG, We denote $c_i$ as the initial column of a tile x to be moved, and $c_j$ as the column tile x moves to. In particular, if the move is valid, $j= i-1, i+1$.
-Now we consider 3 mutually exclusive cases for tile x and prove consistency for each of them.
-\\
-\textbf{Case 1:The goal position of tile x is neither on column $c_i$ nor $c_j$}
-
-Since neither column is the goal column, by the definition of linear conflict, the number of linear conflicts does not change, $LC(s') = LC(s)$.
-However, $MD(s') = MD(s) \pm 1$ since the goal column could be in either direction. Thus we have:
-
-\begin{flalign}
-    f(s') \nonumber &= g(s') + h(s') \\\nonumber
-        &= c(n,n') + g(s) + LC(s') + MD(s') \\\nonumber
-        &= 1 + g(s) + LC(s) + MD(s') \\\nonumber
-        &\geq g(s) + LC(s) + MD(s) \\\nonumber
-        &= g(s) + h(s) \\\nonumber
-\end{flalign}
-
-Since if $m_d(s') = m_d(s) + 1$ then $f(s') > f(s)$ and if $m_d(s') = m_d(s) - 1$ then $f(s') = f(s)$.
-
-\textbf{Case 2: The goal position of tile x is column $c_i$}
-
-We only need consider the linear conflicts along the column $c_i$. Since tile x moves out of it's goal column, the number of linear conflicts could decrease by 1 if tile x was in conflict with another tile along $c_i$, or stay the same if tile x had no conflicts.
-
-Thus $LC(s') = LC(s)$ or $LC(s') = LC(s) - 2$. But since it takes 1 action more to tile x back to its goal, $MD(s') = MD(s) + 1$. Thus we have:
-
-\begin{flalign}
-    f(s') \nonumber &= g(s') + h(s') \\\nonumber
-        &= c(n,n') + g(s) + LC(s') + MD(s') \\\nonumber
-        &= 1 + g(s) + LC(s') + MD(s) + 1 \\\nonumber
-        &\geq g(s) + LC(s) + MD(s) \\\nonumber
-        &= g(s) + h(s) \\\nonumber
-\end{flalign}
-
-Since if $LC(s') = LC(s) - 2$ then $f(s') = f(s)$ and if $LC(s') = LC(s)$ then $f(s') > f(s)$.
-
-\textbf{Case 3}:
-
-We only need to consider the linear conflicts along the column $c_j$. Since tile x moves into its goal column, the number of linear conflicts could increase by 1 if tile x is now in conflict with another tile along $c_j$, or stay the same if tile x in that space does not create conflicts.
-
-Thus $LC(s') = LC(s)$ or $LC(s') = LC(s) - 2$. Since it takes 1 action less to tile x back to its goal, $MD(s') = MD(s) + 1$. Thus we have:
-
-\begin{flalign}
-    f(s') \nonumber &= g(s') + h(s') \\\nonumber
-        &= c(n,n') + g(s) + LC(s') + MD(s') \\\nonumber
-        &= 1 + g(s) + LC(s') + MD(s) - 1 \\\nonumber
-        &\geq g(s) + LC(s) + MD(s) \\\nonumber
-        &= g(s) + h(s) \\\nonumber
-\end{flalign}
-
-Since if $LC(s') = LC(s) + 2$ then $f(s') > f(s)$ and if $LC(s') = LC(s)$ then $f(s') = f(s)$.
-
-Therefore for all cases along the row of the puzzle, $f(s') \geq f(s)$. 
-
+\textbf{Proof of Consistency:}
+Let us first consider the successors of n obtained by moving left or right, at row $r_i$ of the K-Puzzle. We observe that since along $r_i$, tile n is merely swapping places with a blank tile, it will not cause any change to the linear conflicts of that row. \\
+Denote $c_i$ as the initial column of a tile n to be moved, and $c_j$ as the column tile n moves to. Now we consider 3 mutually exclusive cases. \\
+\textbf{Case 1:The goal position of tile n is neither on column $c_i$ nor $c_j$}
+Since neither column is the goal column, $LC(n') = LC(n)$.
+However, $MD(n') = MD(n) \pm 1$ since the goal column could be in either direction. Thus we have $f(n') = 1 + g(n) + LC(n) + MD(n') \geq  g(n) + h(n) = f(n)$. \\
+\textbf{Case 2: The goal position of tile n is column $c_i$} \\
+Since tile n moves out of it's goal column, the number of linear conflicts could decrease by 1, or stay the same.
+Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$, but $MD(n') = MD(n) + 1$. Thus we have $f(n') =1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + h(n) = f(n)$. \\
+\textbf{Case 3: The goal position of tile n is column $c_j$}: \\
+Since tile n moves into its goal column, the number of linear conflicts could increase or stay the same.
+Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$ but, $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + h(n) = f(n)$.
 A similar argument can be made for the actions along the column of the K-Puzzle, since the board can be rotated, so old column = new row.
+Thus $f(n') \geq f(n)$ for all possible successors of a state n, and the Linear Conflict Heuristic is consistent. QED
 
-Thus $f(s') \geq f(s)$ for all possible successors of a state s, and the Linear Conflict Heuristic is consistent. QED
-
-\section{Experiemntal Setup}
+\section{Experimental Setup}
 \section{Results and Discussion}
 
 \bibliographystyle{splncs04}
 \begin{thebibliography}{8}
 \bibitem{ref_url1}
 Soundness and Completeness of State Space Search, \url{https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-410-principles-of-autonomy-and-decision-making-fall-2010/lecture-notes/MIT16\_410F10\_lec04.pdf}. Last accessed 2 March 2020
+
+\bibitem{ref_url1}
+Solvability of the tiles Game, \\ \url{https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html}. Last accessed 2 March 2020
+
+
 \end{thebibliography}
 
 \section{Appendix}
+
+\subsection{Full Proof of Consistency of Linear Conflict}
+
+We partition the proof of consistency into 2 parts:
+Since there are at most 4 successors of each node n, we partition the proof into when the action is along the row (left/right successors) and along the column, (up/down successors) \\
+
+We assume that the Manhattan Distance is consistent.\\
+
+Let us first consider the successors obtained by moving along the row $r_i$ of the K-Puzzle. We observe that since along $r_i$, tile n is merely swapping places with a
+blank tile, it will not cause any change to the linear conflicts of that row.
+
+WLOG, We denote $c_i$ as the initial column of a tile n to be moved, and $c_j$ as the column tile n moves to. In particular, if the move is valid, $j= i-1, i+1$.
+Now we consider 3 mutually exclusive cases for tile n and prove consistency for each of them.
+\\
+\textbf{Case 1:The goal position of tile n is neither on column $c_i$ nor $c_j$}
+
+Since neither column is the goal column, the number of linear conflicts does not change, $LC(n') = LC(n)$.
+However, $MD(n') = MD(n) \pm 1$ since the goal column could be in either direction. Thus we have:
+
+\begin{flalign}
+    f(n') \nonumber &= g(n') + h(n') \\\nonumber
+        &= c(n,n') + g(n) + LC(n') + MD(n') \\\nonumber
+        &= 1 + g(n) + LC(n) + MD(n') \\\nonumber
+        &\geq g(n) + LC(n) + MD(n) \\\nonumber
+        &= g(n) + h(n) \\\nonumber
+\end{flalign}
+
+Since if $m_d(n') = m_d(n) + 1$ then $f(n') > f(n)$ and if $m_d(n') = m_d(n) - 1$ then $f(n') = f(n)$.
+
+\textbf{Case 2: The goal position of tile n is column $c_i$}
+
+We only need consider the linear conflicts along the column $c_i$. Since tile n moves out of it's goal column, the number of linear conflicts could decrease by 1 if tile n was in conflict with another tile along $c_i$, or stay the same if tile n had no conflicts.
+
+Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$. But since it takes 1 action more to tile n back to its goal, $MD(n') = MD(n) + 1$. Thus we have:
+
+\begin{flalign}
+    f(n') \nonumber &= g(n') + h(n') \\\nonumber
+        &= c(n,n') + g(n) + LC(n') + MD(n') \\\nonumber
+        &= 1 + g(n) + LC(n') + MD(n) + 1 \\\nonumber
+        &\geq g(n) + LC(n) + MD(n) \\\nonumber
+        &= g(n) + h(n) \\\nonumber
+\end{flalign}
+
+Since if $LC(n') = LC(n) - 2$ then $f(n') = f(n)$ and if $LC(n') = LC(n)$ then $f(n') > f(n)$.
+
+\textbf{Case 3: The goal position of tile n is column $c_j$}
+
+We only need to consider the linear conflicts along the column $c_j$. Since tile n moves into its goal column, the number of linear conflicts could increase by 1 if tile n is now in conflict with another tile along $c_j$, or stay the same if tile n in that space does not create conflicts.
+
+Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$. Since it takes 1 action less to tile n back to its goal, $MD(n') = MD(n) + 1$. Thus we have:
+
+\begin{flalign}
+    f(s') \nonumber &= g(n') + h(n') \\\nonumber
+        &= c(n,n') + g(n) + LC(n') + MD(n') \\\nonumber
+        &= 1 + g(n) + LC(n') + MD(n) - 1 \\\nonumber
+        &\geq g(n) + LC(n) + MD(n) \\\nonumber
+        &= g(n) + h(n) \\\nonumber
+\end{flalign}
+
+Since if $LC(n') = LC(n) + 2$ then $f(n') > f(n)$ and if $LC(n') = LC(n)$ then $f(n') = f(n)$.
+
+Therefore for all cases along the row of the puzzle, $f(n') \geq f(n)$. 
+
+A similar argument can be made for the actions along the column of the K-Puzzle, since the board can be rotated, so old column = new row.
+
+Thus $f(n') \geq f(n)$ for all possible successors of a state s, and the Linear Conflict Heuristic is consistent. QED
+
+
 \subsection{Solvability of A* Algorithm}
 \begin{definition}
 Inversion number of n-puzzle: flatten the $k \times k$ grid to a sequence of numbers, a pair of numbers $(a,b)$ is called an inversion if $a>b$ but $a$ comes before $b$ in the sequence.
