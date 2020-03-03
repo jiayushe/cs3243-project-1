@@ -57,13 +57,21 @@ class Puzzle(object):
             row_from_bottom = self.N - blank // self.N - 1
             return row_from_bottom % 2 == inversions % 2
 
+    def hash(self, state):
+        res = ""
+        for i in state:
+            if i < 10:
+                res += "0"
+            res += str(i)
+        return res
+
     def BFS(self):
         explored = set()
         frontier = deque()
         root = Node(self.init_state, None, None)
         self.state_visited_count += 1
         self.state_explored_count += 1
-        explored.add(root.state)
+        explored.add(hash(root.state))
         if root.state == self.goal_state:
             self.goal_node = root
             return
@@ -74,10 +82,11 @@ class Puzzle(object):
             node = frontier.popleft()
             neighbors = self.expand(node)
             for neighbor in neighbors:
-                if neighbor.state not in explored:
+                hashed_neighbor_state = hash(neighbor.state)
+                if hashed_neighbor_state not in explored:
                     self.state_visited_count += 1
                     self.state_explored_count += 1
-                    explored.add(neighbor.state)
+                    explored.add(hashed_neighbor_state)
                     if neighbor.state == self.goal_state:
                         self.goal_node = neighbor
                         return
