@@ -10,11 +10,11 @@
 \section{Problem Specification}
 We model the K-Puzzle Problem as follows:
 \begin{enumerate}
-	\item \textbf{State}: A 1 Dimensional array of size n * n = K, where n is the number of rows, running from the tile on the 1st row and 1st column to the tile on the last row last column. Initial State: 1 Dimensional array as specified by input.
-	\item \textbf{Actions}: Left: Number to the right of blank swaps places with the blank. Implemented as 2 items in the array switching places. Right:  Number to the left of blank swaps places with the blank. Implemented as 2 items in the array switching places. Down: Number above the blank swaps places with the blank. Implemented as finding the index of tile above the blank, then switching the places of these 2 items. Up: Number below the blank swaps places with the blank. Implemented as finding the index of tile below blank, then switching the places of these 2 items.
-	\item \textbf{Transition Model}: move(current\_state, action) where action is the move (left,right,up,down) and current\_state is the 1D array of the current state of the puzzle.
+	\item \textbf{State}: A 2 Dimensional array of size $n \times n$, where n is the number of rows, running from the tile on the 1st row and 1st column to the tile on the last row last column. Initial State: a 2 dimensional array as specified by input.
+	\item \textbf{Actions}: Left: Number to the right of blank swaps places with the blank. Implemented as 2 items in the array switching places. Right: Number to the left of blank swaps places with the blank. Implemented as 2 items in the array switching places. Down: Number above the blank swaps places with the blank. Implemented as finding the index of tile above the blank, then switching the places of these 2 items. Up: Number below the blank swaps places with the blank. Implemented as finding the index of tile below blank, then switching the places of these 2 items.
+	\item \textbf{Transition Model}: \texttt{move(current\_state, action)} where action is move "left", "right", "up", "down" and current\_state is the 2D array of the current state of the puzzle.
 	\item \textbf{Goal test}: Test if the current array is equal to the goal array, defined as a array with integers 1 to $k^2 - 1$, where k is the number of rows, in increasing order, with 0 as the last entry of the array.
-	\item \textbf{Cost Function}: Cost of getting from one state to another is constant, since it is the cost of one valid move, one tile sliding into the blank space.
+	\item \textbf{Cost Function}: One valid move takes a constant cost one.
 \end{enumerate}
 
 \section{Technical Analysis}
@@ -46,17 +46,18 @@ By induction on the number of steps $n$ start node is away from the goal node. \
 \end{proof}
 Optimality: 
 \begin{lemma} 
-If h is consistent, f(n) is non-decreasing along any path 
+If $h$ is consistent, $f(n)$ is non-decreasing along any path 
 \end{lemma}
 \begin{proof}
-f(n')=g(n')+h(n')=g(n)+c(n,n')+h(n')g(n)+h(n)=f(n) 
+$f(n')=g(n')+h(n')=g(n)+c(n,n')+h(n')g(n)+h(n)=f(n)$ 
 \end{proof}
-\begin{lemma} [Graph-separation property] In graph search, the frontier always separates the explored region of the search graph from the unexplored region. In other words, every path from the initial node to an unexplored node must include a node on the frontier.  [Source: AIMA Figure 3.9] \end{lemma}
+\begin{lemma} [Graph-separation property] In graph search, the frontier always separates the explored region of the search graph from the unexplored region. In other words, every path from the initial node to an unexplored node must include a node on the frontier~\cite{ref_lncs1}. 
+\end{lemma}
 \begin{theorem} 
 When $A*$ (graph-search, consistent heuristic) selects a node $n$ for expansion, the shortest path to $n$ has been found. 
 \end{theorem}
 \begin{proof}
-Suppose otherwise. By the graph-separation property proved above, any path from the start node $s$ to $n$ (since $n$ is not explored yet, otherwise $A^*$ wouldn’t select it for expansion) must include a node in the frontier. Since the shortest path to $n$ hasn’t been found, there must exist another node $n’$ on the frontier on the optimal path from $s$ to $n$. Since $n’$ is on the path from $s$ to $n$, by Lemma 2, $f(n’)<f(n)$. As both $n$ and $n’$ are in the frontier, $A^*$ will select $n’$ to expand instead of $n$, which is a contradiction.
+Suppose otherwise. By the graph-separation property proved above, any path from the start node $s$ to $n$ (since $n$ is not explored yet, otherwise $A*$ wouldn’t select it for expansion) must include a node in the frontier. Since the shortest path to $n$ hasn’t been found, there must exist another node $n’$ on the frontier on the optimal path from $s$ to $n$. Since $n’$ is on the path from $s$ to $n$, by Lemma 2, $f(n’)<f(n)$. As both $n$ and $n’$ are in the frontier, $A^*$ will select $n’$ to expand instead of $n$, which is a contradiction.
 
 From the theorem above, we proved that A* is optimal.
 \end{proof}
@@ -64,11 +65,9 @@ From the theorem above, we proved that A* is optimal.
 Time complexity: $O(n^{h^*(s_0)-h(s_0)})$\\
 Space complexity: $O(b^m)$
 
-\subsection{Heuristic - Manhattan Distance}
-\subsection{Heuristic - Misplaced Tiles}
 \subsection{Heuristic - Linear Conflict}
 We partition the proof of consistency into 2 parts:
-Since there are at most 4 successors of each node n, we partition the proof into when he action is along the row (left/right successors) and along the column, (up/down successors) \\
+Since there are at most 4 successors of each node $n$, we partition the proof into when he action is along the row (left/right successors) and along the column, (up/down successors) \\
 
 We assume that the Manhattan Distance is consistent.\\
 
@@ -133,13 +132,15 @@ Thus $f(s') \geq f(s)$ for all possible successors of a state s, and the Linear 
 
 \section{Experiemntal Setup}
 \section{Results and Discussion}
-
+\newpage
 \bibliographystyle{splncs04}
 \begin{thebibliography}{8}
+\bibitem{ref_lncs1}
+Russell, S. J., Norvig, P., \& Davis, E. (2010). Artificial intelligence: A modern approach. Prentice Hall.
 \bibitem{ref_url1}
 Soundness and Completeness of State Space Search, \url{https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-410-principles-of-autonomy-and-decision-making-fall-2010/lecture-notes/MIT16\_410F10\_lec04.pdf}. Last accessed 2 March 2020
 \end{thebibliography}
-
+\newpage
 \section{Appendix}
 \subsection{Solvability of A* Algorithm}
 \begin{definition}
@@ -177,7 +178,7 @@ For an odd size grid, the parity of the number of inversions is invariant. (take
 \end{claim}
 When $b$ moves vertically, it either moves in front of, or behind n-1 tiles.
 Of these n-1 tiles, suppose there are $p$ numbers that are greater than $b$, where $n-1 \leq p \leq 0$. Then $n-1-p$ of them are smaller than $b$. The total difference of inversions after $b$ has moved vertically is given by:
-$[(p)-(n-1-p)]= -(n-1)$ if $b$ moves down, or  $[-(p) +(n-1-p)]= (n-1)$ if $b$ moves up. Since n-1 is even, the move doesn’t affect the parity of inversions.
+$[(p)-(n-1-p)]= -(n-1)$ if $b$ moves down, or  $[-(p) +(n-1-p)]= (n-1)$ if $b$ moves up. Since $n-1$ is even, the move doesn’t affect the parity of inversions.
 \begin{table}
 \label{tab3}
 \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
