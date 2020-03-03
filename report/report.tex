@@ -66,6 +66,14 @@ From the theorem above, we proved that A* is optimal.
 Time complexity: $O(n^{h^*(s_0)-h(s_0)})$\\
 Space complexity: $O(b^m)$
 
+\subsection{Heuristic - Misplaced Tiles}
+
+Proof of consistency is given in Artificial Intelligence: A Modern Approach, page 105.
+
+\subsection{Heuristic - Manhattan Distance}
+
+Proof of consistency is given in Artificial Intelligence: A Modern Approach, page 105.
+
 \subsection{Heuristic - Linear Conflict}
 
 \textbf{Definition:}
@@ -74,20 +82,18 @@ if $t_j$ and $t_k$ are in the same line, the goal positions of $t_j$ and $t_k$
 are both in that line, $t_j$ is to the right of $t_k$, and the goal position of $t_j$
 is to the left of the goal position of $t_k$. \\
 Then the Linear conflict heuristic is given by $h(n) = LC(n) + MD(n)$ where $MD(n)=\sum md(n,t_j)$, is the Manhattan distance heuristic of the state. $LC(n) = 2[\sum(lc(n,r_i) +lc(n,c_j)]$ is the 2 times the sum of linear conflicts in the rows and columns. \\
-We assume that the Manhattan Distance is consistent.\\
+
 \textbf{Proof of Consistency:}
 We consider the successors of tile n obtained by moving left or right, at row $r_i$ of the K-Puzzle. We observe that since along $r_i$, tile n is merely swapping places with a blank tile. It will not cause any change to the linear conflicts of that row. \\
 Denote $c_i$ as the initial column n, and $c_j$ as the goal column. Now we consider 3 mutually exclusive cases. \\
 \textbf{1.The goal position of tile n is neither on column $c_i$ nor $c_j$} \\
 Since neither column is the goal column, $LC(n') = LC(n)$.
-However, $MD(n') = MD(n) \pm 1$ since the goal column could be in either direction. Thus we have $f(n') = 1 + g(n) + LC(n) + MD(n') \geq  g(n) + h(n) = f(n)$. \\
+However, $MD(n') = MD(n) \pm 1$. Thus we have $f(n') = 1 + g(n) + LC(n) + MD(n') \geq  g(n) + h(n) = f(n)$. \\
 \textbf{2. The goal position of tile n is column $c_i$}: \\
-Since tile n moves out of it's goal column, the number of linear conflicts could decrease by 1, or stay the same.
-Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$, but $MD(n') = MD(n) + 1$. Thus we have $f(n') =1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + h(n) = f(n)$. \\
+Since tile n moves out of it's goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$, but $MD(n') = MD(n) + 1$. Thus we have $f(n') =1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + h(n) = f(n)$. \\
 \textbf{3. The goal position of tile n is column $c_j$}: \\
-Since tile n moves into its goal column, the number of linear conflicts could increase or stay the same.
-Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$ but, $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + h(n) = f(n)$.
-A similar argument can be made for the actions along the column of the K-Puzzle, since the board can be rotated, so old column = new row.
+Since tile n moves into its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$, but $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + h(n) = f(n)$.
+A similar argument can be made for the actions along the column of the K-Puzzle.
 Thus $f(n') \geq f(n)$ for all possible successors of a state n, and the Linear Conflict Heuristic is consistent. QED
 
 \section{Experimental Setup}
