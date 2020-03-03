@@ -2,8 +2,7 @@ import os
 import sys
 
 from collections import deque
-from heapq import heappush, heappop, heapify
-import itertools
+from heapq import heappush, heappop
 
 class Node(object):
     def __init__(self, state, parent, move, cost, key):
@@ -24,15 +23,25 @@ class Puzzle(object):
         for i in range(len(self.goal_state)):
             self.goal_position[self.goal_state[i]] = i
         # BEGIN profiling
+        self.state_explored_count = 0
         self.state_visited_count = 0
+        self.max_heap_size = 0
         self.max_depth = 0
         # END profiling
 
     def solve(self):
         if self.is_solvable() == False:
+            sys.stderr.write("Unsolvable\n")
+            sys.stderr.flush()
             return ["UNSOLVABLE"]
         self.AStar()
         res = self.backtrace()
+        sys.stderr.write("Solution Depth: " + str(self.goal_node.cost) + "\n")
+        sys.stderr.write("Max Search Depth: " + str(self.max_depth) + "\n")
+        sys.stderr.write("State Explored: " + str(self.state_explored_count) + "\n")
+        sys.stderr.write("State Generated: " + str(self.state_visited_count) + "\n")
+        sys.stderr.write("Max Heap Size: " + str(self.max_heap_size) + "\n")
+        sys.stderr.flush()
         return res
 
     def is_solvable(self):
@@ -87,7 +96,7 @@ class Puzzle(object):
                     # now t_j is guaranteed to be on the same line, right of t_k
                     goal_pos_j = self.goal_position[state[row*self.N + j]]
                     goal_pos_k = self.goal_position[state[row*self.N + k]]
-                    if (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                    if (goal_pos_j // self.N == row) and (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
                         count += 1
         return count * 2 + self.manhattan_distance(state)
 
@@ -102,47 +111,59 @@ class Puzzle(object):
     def AStar(self):
         explored = set()
         heap = list()
+        frontier_cost = dict()
 
-        key = self.manhattan_distance(self.init_state)
+        key = self.linear_conflict(self.init_state)
         root = Node(self.init_state, None, None, 0, key)
         entry = (key, root)
         heappush(heap, entry)
+        frontier_cost[hash(root.state)] = root.cost
 
         while heap:
+            self.max_heap_size = max(self.max_heap_size, len(heap))
             heap_node = heappop(heap)
-            explored.add(hash(heap_node[1].state))
+            if hash(heap_node[1].state) in frontier_cost and frontier_cost[hash(heap_node[1].state)] < heap_node[1].cost:
+                # lazy deletion: if the popped node has a worse cost than recorded, it's a replaced node, ignore it
+                continue
+            self.state_explored_count += 1
+            explored.add(hash(heap_node[1].state)) # add ONLY explored node to the explored set
 
-            if heap_node[1].state == self.goal_state:
+            if heap_node[1].state == self.goal_state: # run goal test ONLY on explored node
                 self.goal_node = heap_node[1]
                 return heap
 
             neighbors = self.expand(heap_node[1])
 
             for neighbor in neighbors:
-                neighbor.key = neighbor.cost + self.manhattan_distance(neighbor.state)
+                neighbor.key = neighbor.cost + self.linear_conflict(neighbor.state)
                 entry = (neighbor.key, neighbor)
-                if hash(neighbor.state) not in explored:
+                hashed_neighbor_state = hash(neighbor.state)
+                if hashed_neighbor_state not in explored and hashed_neighbor_state not in frontier_cost:
+                    # if the child isn't in explored set or the frontier, add it to the frontier
                     self.state_visited_count += 1
                     if self.max_depth < neighbor.cost:
                         self.max_depth = neighbor.cost
                     heappush(heap, entry)
-                    explored.add(hash(neighbor.state))
+                    frontier_cost[hashed_neighbor_state] = neighbor.cost
+                elif hashed_neighbor_state in frontier_cost and frontier_cost[hashed_neighbor_state] > neighbor.cost:
+                    # if the child state is already in the frontier, replace the node in frontier if the cost is bettre
+                    heappush(heap, entry)
+                    frontier_cost[hashed_neighbor_state] = neighbor.cost
     
     def BFS(self):
         explored = set()
-        frontier = deque([Node(self.init_state, None, None, 0, 0)])
+        frontier = deque([Node(self.init_state, None, None)])
 
         while frontier:
             node = frontier.popleft()
             explored.add(node.state)
 
-            if node.state == self.goal_state:
-                self.goal_node = node
-                return frontier
-
             neighbors = self.expand(node)
             for neighbor in neighbors:
                 if neighbor.state not in explored:
+                    if neighbor.state == self.goal_state:
+                        self.goal_node = node
+                        return frontier
                     frontier.append(neighbor)
                     explored.add(neighbor.state)
 

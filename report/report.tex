@@ -1,15 +1,230 @@
 \documentclass{llncs}
+\usepackage{amsmath}  % this package needed for flalign
 
-\title{CS3243 Project 1 Report}
-
-\author{Jeremy Loye \and She Jiayu \and Sebastian Lie \and Tan Yuanhong}
-\institute{National University of Singapore}
 
 \begin{document}
-
+\title{CS3243 PROJECT 1 REPORT}
+\author{Jeremy Loye \and She Jiayu \and Sebastian Lie \and Tan Yuanhong}
+\institute{National University of Singapore}
 \maketitle
 \section{Problem Specification}
+We model the K-Puzzle Problem as follows:
+\begin{enumerate}
+	\item \textbf{State}: A 1 Dimensional array of size n * n = K, where n is the number of rows, running from the tile on the 1st row and 1st column to the tile on the last row last column. Initial State: 1 Dimensional array as specified by input.
+	\item \textbf{Actions}: Left: Number to the right of blank swaps places with the blank. Implemented as 2 items in the array switching places. Right:  Number to the left of blank swaps places with the blank. Implemented as 2 items in the array switching places. Down: Number above the blank swaps places with the blank. Implemented as finding the index of tile above the blank, then switching the places of these 2 items. Up: Number below the blank swaps places with the blank. Implemented as finding the index of tile below blank, then switching the places of these 2 items.
+	\item \textbf{Transition Model}: move(current\_state, action) where action is the move (left,right,up,down) and current\_state is the 1D array of the current state of the puzzle.
+	\item \textbf{Goal test}: Test if the current array is equal to the goal array, defined as a array with integers 1 to $k^2 - 1$, where k is the number of rows, in increasing order, with 0 as the last entry of the array.
+	\item \textbf{Cost Function}: Cost of getting from one state to another is constant, since it is the cost of one valid move, one tile sliding into the blank space.
+\end{enumerate}
+
 \section{Technical Analysis}
+All of our search algorithms are graph-search, meaning when adding nodes to the frontier, we won’t re-add nodes that appeared in the \emph{explored} set. And we adopt the following convention for notations:
+\begin{itemize}
+	\item $g(n)$: cost of reaching $n$ from start node.
+	\item $h(n)$: estimated cost \textbf{from} $n$ to goal.
+	\item $f(n)$: estimated cost of cheapest path \textbf{through} $n$ to goal.
+	\item $c(a,b)$: step cost from node $a$ to $b$.
+\end{itemize}
+
+\subsection{Uninformed search - Breadth-first Search (BFS)}
+\subsubsection{Correctness}\hfill\\
+\emph{Completeness}: BFS searches nodes in a non-decreasing order of depth. In other words, it explores the search tree level-by-level. Thus, as long as the branching factor $b$ is finite, BFS is able to find the goal node. In the context of n-puzzle, $b=4$ which is finite, so BFS is complete.\\
+\emph{Optimality}: Since BFS searches nodes in a non-decreasing order of depth, it outputs the shallowest goal node. In the context of n-puzzle, since step cost is one, the depth of the node is equal to its cost. Thus, BFS outputs the goal node with the least cost, which is optimal.
+\subsubsection{Complexity}\hfill\\
+\emph{Time complexity} of BFS is equal to the number of nodes visited before yielding the result, which can be calculated “layer-by-layer” by $1+b+b^2+\cdots +b^d = O(b^d)$.\\
+\emph{Space complexity} of BFS is equal to the maximum size of the frontier plus the final size of the explored set (as explored set is non-decreasing). It’s trivial to see that BFS will save every generated node with explored set being $O(b^{d=1})$ and frontier being $O(b^d)$. Thus the total complexity is $O(b^d)$.
+
+\subsection{Informed search - A*}
+We assume that the heuristic used in A* is consistent (i.e. $h(n’)+c(n,n’) \geq h(n)$ for every node $n$ and every successor $n’$).
+\subsubsection{Correctness}\hfill\\
+Completeness: 
+\begin{lemma} 
+Any finite graph search algorithm using a frontier queue is complete~\cite{ref_url1}.
+\end{lemma} 
+\begin{proof} 
+By induction on the number of steps $n$ start node is away from the goal node. \emph{Base case}: when $n=1$, meaning the start node is directly connected to the goal node, at the first step of such an algorithm will the goal node be added to the queue, so it is complete. \emph{Inductive step}: suppose $n=k$ is true, consider the case where the start node $s$ is $k+1$ steps away from the goal, since the goal node is reachable from $s$, when adding the neighbors of $s$ to the goal, there exists at least one neighbor that can reach the goal and is $k$ steps away from the goal, by induction assumption, the algorithm is complete. 
+\end{proof}
+Optimality: 
+\begin{lemma} 
+If h is consistent, f(n) is non-decreasing along any path 
+\end{lemma}
+\begin{proof}
+f(n')=g(n')+h(n')=g(n)+c(n,n')+h(n')g(n)+h(n)=f(n) 
+\end{proof}
+\begin{lemma} [Graph-separation property] In graph search, the frontier always separates the explored region of the search graph from the unexplored region. In other words, every path from the initial node to an unexplored node must include a node on the frontier.  [Source: AIMA Figure 3.9] \end{lemma}
+\begin{theorem} 
+When $A*$ (graph-search, consistent heuristic) selects a node $n$ for expansion, the shortest path to $n$ has been found. 
+\end{theorem}
+\begin{proof}
+Suppose otherwise. By the graph-separation property proved above, any path from the start node $s$ to $n$ (since $n$ is not explored yet, otherwise $A^*$ wouldn’t select it for expansion) must include a node in the frontier. Since the shortest path to $n$ hasn’t been found, there must exist another node $n’$ on the frontier on the optimal path from $s$ to $n$. Since $n’$ is on the path from $s$ to $n$, by Lemma 2, $f(n’)<f(n)$. As both $n$ and $n’$ are in the frontier, $A^*$ will select $n’$ to expand instead of $n$, which is a contradiction.
+
+From the theorem above, we proved that A* is optimal.
+\end{proof}
+\subsubsection{Complexity}\hfill\\
+Time complexity: $O(n^{h^*(s_0)-h(s_0)})$\\
+Space complexity: $O(b^m)$
+
+\subsection{Heuristic - Manhattan Distance}
+\subsection{Heuristic - Misplaced Tiles}
+\subsection{Heuristic - Linear Conflict}
+We partition the proof of consistency into 2 parts:
+Since there are at most 4 successors of each node n, we partition the proof into when he action is along the row (left/right successors) and along the column, (up/down successors) \\
+
+We assume that the Manhattan Distance is consistent.\\
+
+Let us first consider the successors obtained by moving along the row $r_i$ of the K-Puzzle. We observe that since along $r_i$, tile x is merely swapping places with a
+blank tile, it will not cause any change to the linear conflicts of that row.
+
+WLOG, We denote $c_i$ as the initial column of a tile x to be moved, and $c_j$ as the column tile x moves to. In particular, if the move is valid, $j= i-1, i+1$.
+Now we consider 3 mutually exclusive cases for tile x and prove consistency for each of them.
+\\
+\textbf{Case 1:The goal position of tile x is neither on column $c_i$ nor $c_j$}
+
+Since neither column is the goal column, by the definition of linear conflict, the number of linear conflicts does not change, $LC(s') = LC(s)$.
+However, $MD(s') = MD(s) \pm 1$ since the goal column could be in either direction. Thus we have:
+
+\begin{flalign}
+    f(s') \nonumber &= g(s') + h(s') \\\nonumber
+        &= c(n,n') + g(s) + LC(s') + MD(s') \\\nonumber
+        &= 1 + g(s) + LC(s) + MD(s') \\\nonumber
+        &\geq g(s) + LC(s) + MD(s) \\\nonumber
+        &= g(s) + h(s) \\\nonumber
+\end{flalign}
+
+Since if $m_d(s') = m_d(s) + 1$ then $f(s') > f(s)$ and if $m_d(s') = m_d(s) - 1$ then $f(s') = f(s)$.
+
+\textbf{Case 2: The goal position of tile x is column $c_i$}
+
+We only need consider the linear conflicts along the column $c_i$. Since tile x moves out of it's goal column, the number of linear conflicts could decrease by 1 if tile x was in conflict with another tile along $c_i$, or stay the same if tile x had no conflicts.
+
+Thus $LC(s') = LC(s)$ or $LC(s') = LC(s) - 2$. But since it takes 1 action more to tile x back to its goal, $MD(s') = MD(s) + 1$. Thus we have:
+
+\begin{flalign}
+    f(s') \nonumber &= g(s') + h(s') \\\nonumber
+        &= c(n,n') + g(s) + LC(s') + MD(s') \\\nonumber
+        &= 1 + g(s) + LC(s') + MD(s) + 1 \\\nonumber
+        &\geq g(s) + LC(s) + MD(s) \\\nonumber
+        &= g(s) + h(s) \\\nonumber
+\end{flalign}
+
+Since if $LC(s') = LC(s) - 2$ then $f(s') = f(s)$ and if $LC(s') = LC(s)$ then $f(s') > f(s)$.
+
+\textbf{Case 3}:
+
+We only need to consider the linear conflicts along the column $c_j$. Since tile x moves into its goal column, the number of linear conflicts could increase by 1 if tile x is now in conflict with another tile along $c_j$, or stay the same if tile x in that space does not create conflicts.
+
+Thus $LC(s') = LC(s)$ or $LC(s') = LC(s) - 2$. Since it takes 1 action less to tile x back to its goal, $MD(s') = MD(s) + 1$. Thus we have:
+
+\begin{flalign}
+    f(s') \nonumber &= g(s') + h(s') \\\nonumber
+        &= c(n,n') + g(s) + LC(s') + MD(s') \\\nonumber
+        &= 1 + g(s) + LC(s') + MD(s) - 1 \\\nonumber
+        &\geq g(s) + LC(s) + MD(s) \\\nonumber
+        &= g(s) + h(s) \\\nonumber
+\end{flalign}
+
+Since if $LC(s') = LC(s) + 2$ then $f(s') > f(s)$ and if $LC(s') = LC(s)$ then $f(s') = f(s)$.
+
+Therefore for all cases along the row of the puzzle, $f(s') \geq f(s)$. 
+
+A similar argument can be made for the actions along the column of the K-Puzzle, since the board can be rotated, so old column = new row.
+
+Thus $f(s') \geq f(s)$ for all possible successors of a state s, and the Linear Conflict Heuristic is consistent. QED
+
 \section{Experiemntal Setup}
 \section{Results and Discussion}
+
+\bibliographystyle{splncs04}
+\begin{thebibliography}{8}
+\bibitem{ref_url1}
+Soundness and Completeness of State Space Search, \url{https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-410-principles-of-autonomy-and-decision-making-fall-2010/lecture-notes/MIT16\_410F10\_lec04.pdf}. Last accessed 2 March 2020
+\end{thebibliography}
+
+\section{Appendix}
+\subsection{Solvability of A* Algorithm}
+\begin{definition}
+Inversion number of n-puzzle: flatten the $k \times k$ grid to a sequence of numbers, a pair of numbers $(a,b)$ is called an inversion if $a>b$ but $a$ comes before $b$ in the sequence.
+\end{definition}
+Let $b$ be the number of the tile that moves.
+
+We note that for a grid of any size, a horizontal move does not change the number of inversions, since its order relative to other numbered tiles in the grid remains the same.
+\begin{table}
+\label{tab1}
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+x &  x & x\\
+\hline
+a & 0 & b\\
+\hline
+x & x & x\\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\label{tab2}
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+x &  x & x\\
+\hline
+0 & a & b\\
+\hline
+x & x & x\\
+\hline
+\end{tabular}
+\end{table}
+\begin{claim}
+For an odd size grid, the parity of the number of inversions is invariant. (take 8-puzzle as an example, $n*n-1$-puzzle is similar).
+\end{claim}
+When $b$ moves vertically, it either moves in front of, or behind n-1 tiles.
+Of these n-1 tiles, suppose there are $p$ numbers that are greater than $b$, where $n-1 \leq p \leq 0$. Then $n-1-p$ of them are smaller than $b$. The total difference of inversions after $b$ has moved vertically is given by:
+$[(p)-(n-1-p)]= -(n-1)$ if $b$ moves down, or  $[-(p) +(n-1-p)]= (n-1)$ if $b$ moves up. Since n-1 is even, the move doesn’t affect the parity of inversions.
+\begin{table}
+\label{tab3}
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+a &  x & x\\
+\hline
+0 & c & d\\
+\hline
+b & x & x\\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\label{tab4}
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+a &  x & x\\
+\hline
+b & c & d\\
+\hline
+0 & x & x\\
+\hline
+\end{tabular}
+\end{table}
+Using the fact proved above, we make a further claim:
+\begin{claim}
+For any odd-sized grid, if the K-Puzzle’s initial state has an odd number of inversions, it is unsolvable.
+\end{claim}
+\begin{proof} 
+First, we observe that 0 has even parity. Since any legal move does not change the parity of number of inversions, every legal move on a grid with an odd number of inversions will result in an odd number of inversions. Therefore legal moves on a grid with an odd number of inversions will never result in 0 inversions, and thus the K-puzzle is unsolvable. 
+\end{proof}
+\begin{claim}
+For an even sized grid, moving a tile vertically always results in the change in parity of the number of inversions.
+\end{claim}
+When $b$ moves vertically, it either moves in front of, or behind $n-1$ tiles.
+Of these $n-1$ tiles, suppose there are $p$ numbers that are greater than $b$, where $n-1 \leq p \leq 0$. Then $n-1-p$ of them are smaller than $b$. The total difference of inversions after $b$ has moved vertically is given by:
+$[(p)-(n-1-p)]= -(n-1)$ if $b$ moves down, or  $[-(p) +(n-1-p)]= (n-1)$ if $b$ moves up. Since $n-1$ is odd, the move always changes the parity of the number of inversions.
+\begin{claim}
+For any even-sized grid, if the K-Puzzle’s initial state has an odd number of inversions and its blank is on an odd-numbered row counting from the bottom or has an even number of inversions with its blank on an even-numbered row counting from the bottom, it is unsolvable.
+\end{claim}
+First we note that the goal state has 0 inversions, with the blank on the 1st row from the bottom. Thus the goal state has an even number of inversions with its blank on an odd-numbered row counting from the bottom.
+
+We also note that having an odd number of inversions and its blank is on an odd-numbered row counting from the bottom is equivalent to  an even number of inversions with its blank on an even-numbered row.
+
+We ignore horizontal moves since it does not change the number of inversions.
+
+If the initial state has an odd number of inversions and its blank is on an odd-numbered row, then any vertical move made will result in an even number of inversions with its blank on an even-numbered row, and vice versa. Therefore, if an initial state starts with an odd number of inversions and its blank is on an odd-numbered row, it can never have an even number of inversions with its blank is on an odd-numbered row, and thus never reach the goal state. Therefore such grids are unsolvable. 
+
+Thus, our unsolvability check has been proved.
 \end{document}
