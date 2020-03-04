@@ -85,8 +85,10 @@ class Puzzle(object):
     # linear conflict
     def linear_conflict(self, state):
         count = 0
-        for row in range(self.N):
-            for k in range(self.N):
+        for row in range(self.N): # for each row r_i
+            lc = 0
+            C = [0] * self.N
+            for k in range(self.N): # for each tile t_k in row r_i, calculate C
                 if state[row*self.N + k] == 0:
                     continue
                 for j in range(k+1, self.N):
@@ -96,8 +98,24 @@ class Puzzle(object):
                     goal_pos_j = self.goal_position[state[row*self.N + j]]
                     goal_pos_k = self.goal_position[state[row*self.N + k]]
                     if (goal_pos_j // self.N == row) and (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
-                        count += 1
+                        C[k] += 1
+            while not all(v==0 for v in C):
+                j = C.index(max(C))
+                C[j] = 0
+                for k in range(j-1):
+                    if C[k] <= 0: # TODO: this step doesn't appear in the original algorithm
+                        continue
+                    if state[row*self.N + k] == 0:
+                        continue
+                    goal_pos_j = self.goal_position[state[row*self.N + j]]
+                    goal_pos_k = self.goal_position[state[row*self.N + k]]
+                    if (goal_pos_j // self.N == row) and (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
+                        C[k] -= 1
+                lc += 1
+            count += lc
         for col in range(self.N):
+            lc = 0
+            C = [0] * self.N
             for k in range(self.N):
                 if state[k*self.N + col] == 0:
                     continue
@@ -108,7 +126,22 @@ class Puzzle(object):
                     goal_pos_j = self.goal_position[state[j*self.N + col]]
                     goal_pos_k = self.goal_position[state[k*self.N + col]]
                     if (goal_pos_j % self.N == col) and (goal_pos_j % self.N == goal_pos_k % self.N) and (goal_pos_j // self.N < goal_pos_k // self.N):
-                        count += 1
+                        C[k] += 1
+            while not all(v==0 for v in C):
+                j = C.index(max(C))
+                C[j] = 0
+                for k in range(j-1):
+                    if C[k] <= 0: # TODO: this step doesn't appear in the original algorithm
+                        continue
+                    if state[k*self.N + col] == 0:
+                        continue
+                    goal_pos_j = self.goal_position[state[j*self.N + col]]
+                    goal_pos_k = self.goal_position[state[k*self.N + col]]
+                    if (goal_pos_j % self.N == col) and (goal_pos_j % self.N == goal_pos_k % self.N) and (goal_pos_j // self.N < goal_pos_k // self.N):
+                        C[k] -= 1
+                lc += 1
+                print C
+            count += lc
         return count * 2 + self.manhattan_distance(state)
 
     def heuristic(self, state):
