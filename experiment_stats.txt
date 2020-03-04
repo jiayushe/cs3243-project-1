@@ -1,0 +1,810 @@
+> Dimension = 3
+
+> Solution = CS3243_P1_02_1.py
+> experiment/test_3_0.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 11420
+State Generated: 11420
+Max Heap Size: 4337
+Puzzle solved (0.209037065506s)
+> experiment/test_3_1.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 4916
+State Generated: 4916
+Max Heap Size: 1854
+Puzzle solved (0.123121976852s)
+> experiment/test_3_2.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 4067
+State Generated: 4067
+Max Heap Size: 1471
+Puzzle solved (0.116006851196s)
+> experiment/test_3_3.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 10035
+State Generated: 10035
+Max Heap Size: 3488
+Puzzle solved (0.186880111694s)
+> experiment/test_3_4.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 4745
+State Generated: 4745
+Max Heap Size: 1882
+Puzzle solved (0.135130167007s)
+> experiment/test_3_5.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 434
+State Generated: 434
+Max Heap Size: 158
+Puzzle solved (0.0767688751221s)
+> experiment/test_3_6.in
+Solution Depth: 20
+Max Search Depth: 20
+State Explored: 44097
+State Generated: 44097
+Max Heap Size: 13325
+Puzzle solved (0.631035089493s)
+> experiment/test_3_7.in
+Solution Depth: 18
+Max Search Depth: 18
+State Explored: 20634
+State Generated: 20634
+Max Heap Size: 7025
+Puzzle solved (0.303812980652s)
+> experiment/test_3_8.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 587
+State Generated: 587
+Max Heap Size: 230
+Puzzle solved (0.0973579883575s)
+> experiment/test_3_9.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 3684
+State Generated: 3684
+Max Heap Size: 1394
+Puzzle solved (0.126770019531s)
+> Pass Rate:
+100%
+> Average Runtime:
+0.200592112541s
+> Standard Deviation:
+0.156548961935s
+> Max Runtime:
+0.631035089493s
+
+> Solution = CS3243_P1_02_2.py
+> experiment/test_3_0.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 546
+State Generated: 875
+Max Heap Size: 331
+Puzzle solved (0.0922691822052s)
+> experiment/test_3_1.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 313
+State Generated: 501
+Max Heap Size: 189
+Puzzle solved (0.0776557922363s)
+> experiment/test_3_2.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 308
+State Generated: 495
+Max Heap Size: 188
+Puzzle solved (0.0749611854553s)
+> experiment/test_3_3.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 618
+State Generated: 990
+Max Heap Size: 373
+Puzzle solved (0.10365486145s)
+> experiment/test_3_4.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 236
+State Generated: 388
+Max Heap Size: 156
+Puzzle solved (0.0734269618988s)
+> experiment/test_3_5.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 42
+State Generated: 74
+Max Heap Size: 33
+Puzzle solved (0.0732119083405s)
+> experiment/test_3_6.in
+Solution Depth: 20
+Max Search Depth: 20
+State Explored: 2402
+State Generated: 3791
+Max Heap Size: 1395
+Puzzle solved (0.153084039688s)
+> experiment/test_3_7.in
+Solution Depth: 18
+Max Search Depth: 18
+State Explored: 1154
+State Generated: 1837
+Max Heap Size: 686
+Puzzle solved (0.117256879807s)
+> experiment/test_3_8.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 30
+State Generated: 51
+Max Heap Size: 22
+Puzzle solved (0.0665681362152s)
+> experiment/test_3_9.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 296
+State Generated: 484
+Max Heap Size: 189
+Puzzle solved (0.0995090007782s)
+> Pass Rate:
+100%
+> Average Runtime:
+0.0931597948074s
+> Standard Deviation:
+0.0252761138527s
+> Max Runtime:
+0.153084039688s
+
+> Solution = CS3243_P1_02_3.py
+> experiment/test_3_0.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 70
+State Generated: 121
+Max Heap Size: 52
+Puzzle solved (0.091616153717s)
+> experiment/test_3_1.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 80
+State Generated: 135
+Max Heap Size: 58
+Puzzle solved (0.0709910392761s)
+> experiment/test_3_2.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 85
+State Generated: 138
+Max Heap Size: 55
+Puzzle solved (0.0701169967651s)
+> experiment/test_3_3.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 71
+State Generated: 117
+Max Heap Size: 47
+Puzzle solved (0.0695388317108s)
+> experiment/test_3_4.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 65
+State Generated: 117
+Max Heap Size: 54
+Puzzle solved (0.0810170173645s)
+> experiment/test_3_5.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 13
+State Generated: 24
+Max Heap Size: 12
+Puzzle solved (0.0687589645386s)
+> experiment/test_3_6.in
+Solution Depth: 20
+Max Search Depth: 20
+State Explored: 463
+State Generated: 740
+Max Heap Size: 280
+Puzzle solved (0.0891029834747s)
+> experiment/test_3_7.in
+Solution Depth: 18
+Max Search Depth: 18
+State Explored: 223
+State Generated: 367
+Max Heap Size: 145
+Puzzle solved (0.0820281505585s)
+> experiment/test_3_8.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 12
+State Generated: 23
+Max Heap Size: 12
+Puzzle solved (0.0671679973602s)
+> experiment/test_3_9.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 114
+State Generated: 190
+Max Heap Size: 77
+Puzzle solved (0.082230091095s)
+> Pass Rate:
+100%
+> Average Runtime:
+0.0772568225861s
+> Standard Deviation:
+0.00855548055697s
+> Max Runtime:
+0.091616153717s
+
+> Solution = CS3243_P1_02_4.py
+> experiment/test_3_0.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 66
+State Generated: 115
+Max Heap Size: 51
+Puzzle solved (0.0968210697174s)
+> experiment/test_3_1.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 47
+State Generated: 85
+Max Heap Size: 39
+Puzzle solved (0.0737628936768s)
+> experiment/test_3_2.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 64
+State Generated: 107
+Max Heap Size: 44
+Puzzle solved (0.0845890045166s)
+> experiment/test_3_3.in
+Solution Depth: 16
+Max Search Depth: 16
+State Explored: 22
+State Generated: 37
+Max Heap Size: 16
+Puzzle solved (0.0795729160309s)
+> experiment/test_3_4.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 21
+State Generated: 38
+Max Heap Size: 18
+Puzzle solved (0.0811221599579s)
+> experiment/test_3_5.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 13
+State Generated: 24
+Max Heap Size: 12
+Puzzle solved (0.0673799514771s)
+> experiment/test_3_6.in
+Solution Depth: 20
+Max Search Depth: 20
+State Explored: 200
+State Generated: 327
+Max Heap Size: 129
+Puzzle solved (0.118553876877s)
+> experiment/test_3_7.in
+Solution Depth: 18
+Max Search Depth: 18
+State Explored: 150
+State Generated: 253
+Max Heap Size: 105
+Puzzle solved (0.110976934433s)
+> experiment/test_3_8.in
+Solution Depth: 10
+Max Search Depth: 10
+State Explored: 11
+State Generated: 21
+Max Heap Size: 11
+Puzzle solved (0.0788180828094s)
+> experiment/test_3_9.in
+Solution Depth: 14
+Max Search Depth: 14
+State Explored: 91
+State Generated: 153
+Max Heap Size: 63
+Puzzle solved (0.0898189544678s)
+> Pass Rate:
+100%
+> Average Runtime:
+0.0881415843964s
+> Standard Deviation:
+0.0154419650043s
+> Max Runtime:
+0.118553876877s
+
+> Dimension = 4
+
+> Solution = CS3243_P1_02_1.py
+> experiment/test_4_0.in
+Time limit exceeded (60s)
+> experiment/test_4_1.in
+Time limit exceeded (60s)
+> experiment/test_4_2.in
+Time limit exceeded (60s)
+> experiment/test_4_3.in
+Time limit exceeded (60s)
+> experiment/test_4_4.in
+Time limit exceeded (60s)
+> experiment/test_4_5.in
+Time limit exceeded (60s)
+> experiment/test_4_6.in
+Time limit exceeded (60s)
+> experiment/test_4_7.in
+Time limit exceeded (60s)
+> experiment/test_4_8.in
+Time limit exceeded (60s)
+> experiment/test_4_9.in
+Time limit exceeded (60s)
+> Pass Rate:
+0%
+> Average Runtime:
+0s
+> Standard Deviation:
+0s
+> Max Runtime:
+0s
+
+> Solution = CS3243_P1_02_2.py
+> experiment/test_4_0.in
+Solution Depth: 26
+Max Search Depth: 26
+State Explored: 70007
+State Generated: 134575
+Max Heap Size: 64838
+Puzzle solved (3.36911010742s)
+> experiment/test_4_1.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 14082
+State Generated: 27804
+Max Heap Size: 13730
+Puzzle solved (0.720044851303s)
+> experiment/test_4_2.in
+Solution Depth: 22
+Max Search Depth: 22
+State Explored: 3228
+State Generated: 6496
+Max Heap Size: 3270
+Puzzle solved (0.212301969528s)
+> experiment/test_4_3.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 144658
+State Generated: 278122
+Max Heap Size: 133767
+Puzzle solved (7.53393292427s)
+> experiment/test_4_4.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 18178
+State Generated: 35263
+Max Heap Size: 17120
+Puzzle solved (0.837613105774s)
+> experiment/test_4_5.in
+Time limit exceeded (60s)
+> experiment/test_4_6.in
+Solution Depth: 26
+Max Search Depth: 26
+State Explored: 36699
+State Generated: 72298
+Max Heap Size: 35677
+Puzzle solved (1.66494894028s)
+> experiment/test_4_7.in
+Time limit exceeded (60s)
+> experiment/test_4_8.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 365005
+State Generated: 691384
+Max Heap Size: 328382
+Puzzle solved (19.0928528309s)
+> experiment/test_4_9.in
+Time limit exceeded (60s)
+> Pass Rate:
+70%
+> Average Runtime:
+4.77582924707s
+> Standard Deviation:
+6.29087150297s
+> Max Runtime:
+19.0928528309s
+
+> Solution = CS3243_P1_02_3.py
+> experiment/test_4_0.in
+Solution Depth: 26
+Max Search Depth: 26
+State Explored: 957
+State Generated: 1873
+Max Heap Size: 932
+Puzzle solved (0.137631893158s)
+> experiment/test_4_1.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 560
+State Generated: 1139
+Max Heap Size: 584
+Puzzle solved (0.110702037811s)
+> experiment/test_4_2.in
+Solution Depth: 22
+Max Search Depth: 22
+State Explored: 151
+State Generated: 302
+Max Heap Size: 155
+Puzzle solved (0.0774390697479s)
+> experiment/test_4_3.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 885
+State Generated: 1743
+Max Heap Size: 864
+Puzzle solved (0.131488800049s)
+> experiment/test_4_4.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 1016
+State Generated: 2040
+Max Heap Size: 1039
+Puzzle solved (0.142030000687s)
+> experiment/test_4_5.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 41183
+State Generated: 80862
+Max Heap Size: 40249
+Puzzle solved (3.28697299957s)
+> experiment/test_4_6.in
+Solution Depth: 26
+Max Search Depth: 26
+State Explored: 335
+State Generated: 677
+Max Heap Size: 349
+Puzzle solved (0.0928859710693s)
+> experiment/test_4_7.in
+Solution Depth: 34
+Max Search Depth: 34
+State Explored: 12804
+State Generated: 24455
+Max Heap Size: 11943
+Puzzle solved (1.03412008286s)
+> experiment/test_4_8.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 6492
+State Generated: 12360
+Max Heap Size: 5968
+Puzzle solved (0.566579818726s)
+> experiment/test_4_9.in
+Solution Depth: 38
+Max Search Depth: 38
+State Explored: 191696
+State Generated: 359151
+Max Heap Size: 170992
+Puzzle solved (15.7969839573s)
+> Pass Rate:
+100%
+> Average Runtime:
+2.1376834631s
+> Standard Deviation:
+4.6489320141s
+> Max Runtime:
+15.7969839573s
+
+> Solution = CS3243_P1_02_4.py
+> experiment/test_4_0.in
+Solution Depth: 26
+Max Search Depth: 26
+State Explored: 494
+State Generated: 1029
+Max Heap Size: 541
+Puzzle solved (0.264492988586s)
+> experiment/test_4_1.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 294
+State Generated: 598
+Max Heap Size: 306
+Puzzle solved (0.153543949127s)
+> experiment/test_4_2.in
+Solution Depth: 22
+Max Search Depth: 22
+State Explored: 138
+State Generated: 278
+Max Heap Size: 144
+Puzzle solved (0.103485107422s)
+> experiment/test_4_3.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 589
+State Generated: 1167
+Max Heap Size: 592
+Puzzle solved (0.235831022263s)
+> experiment/test_4_4.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 649
+State Generated: 1292
+Max Heap Size: 654
+Puzzle solved (0.244931936264s)
+> experiment/test_4_5.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 6842
+State Generated: 13480
+Max Heap Size: 6729
+Puzzle solved (1.8754799366s)
+> experiment/test_4_6.in
+Solution Depth: 26
+Max Search Depth: 26
+State Explored: 225
+State Generated: 455
+Max Heap Size: 236
+Puzzle solved (0.137407064438s)
+> experiment/test_4_7.in
+Solution Depth: 34
+Max Search Depth: 34
+State Explored: 4946
+State Generated: 9693
+Max Heap Size: 4825
+Puzzle solved (1.86431217194s)
+> experiment/test_4_8.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 2953
+State Generated: 5535
+Max Heap Size: 2675
+Puzzle solved (0.847950935364s)
+> experiment/test_4_9.in
+Solution Depth: 38
+Max Search Depth: 38
+State Explored: 17737
+State Generated: 33398
+Max Heap Size: 16003
+Puzzle solved (4.57913303375s)
+> Pass Rate:
+100%
+> Average Runtime:
+1.03065681458s
+> Standard Deviation:
+1.35265518078s
+> Max Runtime:
+4.57913303375s
+
+> Dimension = 5
+
+> Solution = CS3243_P1_02_1.py
+> experiment/test_5_0.in
+Time limit exceeded (60s)
+> experiment/test_5_1.in
+Time limit exceeded (60s)
+> experiment/test_5_2.in
+Time limit exceeded (60s)
+> experiment/test_5_3.in
+Time limit exceeded (60s)
+> experiment/test_5_4.in
+Time limit exceeded (60s)
+> experiment/test_5_5.in
+Time limit exceeded (60s)
+> experiment/test_5_6.in
+Time limit exceeded (60s)
+> experiment/test_5_7.in
+Time limit exceeded (60s)
+> experiment/test_5_8.in
+Time limit exceeded (60s)
+> experiment/test_5_9.in
+Time limit exceeded (60s)
+> Pass Rate:
+0%
+> Average Runtime:
+0s
+> Standard Deviation:
+0s
+> Max Runtime:
+0s
+
+> Solution = CS3243_P1_02_2.py
+> experiment/test_5_0.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 12221
+State Generated: 27873
+Max Heap Size: 15689
+Puzzle solved (0.726152181625s)
+> experiment/test_5_1.in
+Time limit exceeded (60s)
+> experiment/test_5_2.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 309939
+State Generated: 670263
+Max Heap Size: 361664
+Puzzle solved (18.4333868027s)
+> experiment/test_5_3.in
+Time limit exceeded (60s)
+> experiment/test_5_4.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 1900
+State Generated: 4470
+Max Heap Size: 2572
+Puzzle solved (0.182621955872s)
+> experiment/test_5_5.in
+Solution Depth: 30
+Max Search Depth: 30
+State Explored: 59016
+State Generated: 129804
+Max Heap Size: 71087
+Puzzle solved (3.37179493904s)
+> experiment/test_5_6.in
+Time limit exceeded (60s)
+> experiment/test_5_7.in
+Time limit exceeded (60s)
+> experiment/test_5_8.in
+Time limit exceeded (60s)
+> experiment/test_5_9.in
+Time limit exceeded (60s)
+> Pass Rate:
+40%
+> Average Runtime:
+5.6784889698s
+> Standard Deviation:
+7.46221230562s
+> Max Runtime:
+18.4333868027s
+
+> Solution = CS3243_P1_02_3.py
+> experiment/test_5_0.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 494
+State Generated: 1156
+Max Heap Size: 665
+Puzzle solved (0.138993024826s)
+> experiment/test_5_1.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 4056
+State Generated: 9296
+Max Heap Size: 5267
+Puzzle solved (0.558048009872s)
+> experiment/test_5_2.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 441
+State Generated: 1002
+Max Heap Size: 566
+Puzzle solved (0.128540992737s)
+> experiment/test_5_3.in
+Solution Depth: 40
+Max Search Depth: 40
+State Explored: 44111
+State Generated: 97597
+Max Heap Size: 53925
+Puzzle solved (4.90892696381s)
+> experiment/test_5_4.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 42
+State Generated: 98
+Max Heap Size: 57
+Puzzle solved (0.0762188434601s)
+> experiment/test_5_5.in
+Solution Depth: 30
+Max Search Depth: 30
+State Explored: 435
+State Generated: 962
+Max Heap Size: 531
+Puzzle solved (0.127007961273s)
+> experiment/test_5_6.in
+Time limit exceeded (60s)
+> experiment/test_5_7.in
+Solution Depth: 40
+Max Search Depth: 40
+State Explored: 16749
+State Generated: 37075
+Max Heap Size: 20387
+Puzzle solved (1.84778094292s)
+> experiment/test_5_8.in
+Solution Depth: 42
+Max Search Depth: 42
+State Explored: 492175
+State Generated: 1051867
+Max Heap Size: 567882
+Puzzle solved (58.145991087s)
+> experiment/test_5_9.in
+Solution Depth: 36
+Max Search Depth: 36
+State Explored: 14968
+State Generated: 33339
+Max Heap Size: 18475
+Puzzle solved (1.71954798698s)
+> Pass Rate:
+90%
+> Average Runtime:
+7.5167839792s
+> Standard Deviation:
+17.9606848742s
+> Max Runtime:
+58.145991087s
+
+> Solution = CS3243_P1_02_4.py
+> experiment/test_5_0.in
+Solution Depth: 28
+Max Search Depth: 28
+State Explored: 556
+State Generated: 1268
+Max Heap Size: 721
+Puzzle solved (0.459890127182s)
+> experiment/test_5_1.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 1136
+State Generated: 2672
+Max Heap Size: 1538
+Puzzle solved (0.929611206055s)
+> experiment/test_5_2.in
+Solution Depth: 32
+Max Search Depth: 32
+State Explored: 502
+State Generated: 1169
+Max Heap Size: 675
+Puzzle solved (0.450004816055s)
+> experiment/test_5_3.in
+Solution Depth: 40
+Max Search Depth: 40
+State Explored: 4806
+State Generated: 10997
+Max Heap Size: 6297
+Puzzle solved (2.71240901947s)
+> experiment/test_5_4.in
+Solution Depth: 24
+Max Search Depth: 24
+State Explored: 41
+State Generated: 96
+Max Heap Size: 56
+Puzzle solved (0.097766160965s)
+> experiment/test_5_5.in
+Solution Depth: 30
+Max Search Depth: 30
+State Explored: 370
+State Generated: 836
+Max Heap Size: 471
+Puzzle solved (0.29356098175s)
+> experiment/test_5_6.in
+Solution Depth: 44
+Max Search Depth: 44
+State Explored: 70427
+State Generated: 159175
+Max Heap Size: 89574
+Puzzle solved (38.0280101299s)
+> experiment/test_5_7.in
+Solution Depth: 40
+Max Search Depth: 40
+State Explored: 6965
+State Generated: 15582
+Max Heap Size: 8675
+Puzzle solved (3.40857815742s)
+> experiment/test_5_8.in
+Time limit exceeded (60s)
+> experiment/test_5_9.in
+Solution Depth: 36
+Max Search Depth: 36
+State Explored: 2071
+State Generated: 4675
+Max Heap Size: 2613
+Puzzle solved (1.09695386887s)
+> Pass Rate:
+90%
+> Average Runtime:
+5.27519827419s
+> Standard Deviation:
+11.6296216382s
+> Max Runtime:
+38.0280101299s
