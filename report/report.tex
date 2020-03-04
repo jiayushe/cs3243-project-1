@@ -17,7 +17,7 @@ We model the $k$-puzzle Problem as follows:
 	\item[] \textbf{Transition Model}
 		\texttt{move(current\_state, action)} where \texttt{action} is one of \texttt{LEFT}, \texttt{RIGHT}, \texttt{UP}, \texttt{DOWN} and \texttt{current\_state} is the array representing the current arrangement of numbers in the grid.
 	\item[] \textbf{Goal test}
-		Test if the current state is equal to the goal state for every single cell.
+		Test if the current state is equal to the goal state for every cell.
 	\item[] \textbf{Cost Function}
 		Cost equals to the number of moves required for the initial state to transit into the current state.
 \end{itemize}
@@ -42,7 +42,7 @@ All of our search algorithms are graph based, i.e. we maintain an \texttt{explor
 \end{itemize}
 \subsubsection{Complexity}
 \begin{itemize}
-	\item[] \textbf{Time complexity} of BFS is equal to the number of nodes visited before yielding the result, which can be calculated “layer-by-layer” by $1+b+b^2+\cdots +b^d = O(b^d)$, where $d$ is the depth of the goal node.
+	\item[] \textbf{Time complexity} of BFS is equal to the number of nodes visited before yielding the result, which can be calculated layer-by-layer by $1+b+\cdots +b^d = O(b^d)$, where $d$ is the depth of the goal node.
 	\item[] \textbf{Space complexity} of BFS is equal to the maximum size of the frontier plus the maximum size of the explored set. Since BFS saves every generated node, the maximum size is $O(b^d)$ for both the explored set and the frontier, leading to a total complexity is $O(b^d)$.
 \end{itemize}
 
@@ -87,9 +87,8 @@ Proof of consistency is given in AIMA, page 105~\cite{aima}.
 
 \subsection{Heuristic 3 - Linear Conflict}
 
-\begin{itemize}
-\item[] The definition of linear conflict, the algorithm, and the idea for the proof is taken from \cite{lc}.
-\item[]The full algorithm for calculating the linear conflict heuristic is given in the appendix.
+The definition of linear conflict, the algorithm, and the idea for the proof is taken from \cite{lc}.
+The full algorithm for calculating the linear conflict heuristic is given in the appendix.
 
 \begin{definition}
 Two tiles $t_j$ and $t_k$ are in a linear conflict if $t_j$ and $t_k$ are in the same line, the goal positions of $t_j$ and $t_k$ are both in that line, $t_j$ is to the right of $t_k$, and the goal position of $t_j$ is to the left of the goal position of $t_k$.
@@ -99,16 +98,21 @@ The estimated cost of node $n$ by Linear Conflict heuristic is $h(n) = LC(n) + M
 \begin{proof}
 Consider the successor of a state obtained by moving a tile $t$ left or right along row $r_i$ of the $k$-puzzle. Since along $r_i$ tile $t$ is merely swapping places with an blank, number of linear conflicts of that row remains the same.
 Denote $c_i$ as the initial column and $c_j$ as the goal column. Now we consider 3 mutually exclusive cases for horizontal moves.
-\item[]\textbf{Case 1: The goal position of tile $t$ is neither on column $c_i$ nor $c_j$} \\
-Since neither column is the goal column, we have $LC(n') = LC(n)$ and $MD(n') = MD(n) \pm 1$, so $f(n') = 1 + g(n) + LC(n) + MD(n') \geq g(n) + LC(n) + MD(n) = f(n)$.
-\item[]\textbf{Case 2: The goal position of tile $t$ is column $c_i$} \\
-Since tile $t$ moves out of its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$ since $lc(n,c_i) - 1$, and $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + LC(n) + MD(n) = f(n)$.
-\item[]\textbf{Case 3: The goal position of tile $t$ is column $c_j$} \\
-Since tile $t$ moves into its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2$, since $lc(n,c_j) + 1$, but $MD(n') = MD(n) - 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + LC(n) + MD(n) = f(n)$.  \\
 
-\item[]A similar argument can be made for vertical moves. Hence, $f(n') \geq f(n)$ for any possible successor $n'$ of any state n. Thus the linear conflict heuristic is consistent.
+\textbf{Case 1: The goal position of tile $t$ is neither on column $c_i$ nor $c_j$}
+
+Since neither column is the goal column, we have $LC(n') = LC(n)$ and $MD(n') = MD(n) \pm 1$, so $f(n') = 1 + g(n) + LC(n) + MD(n') \geq g(n) + LC(n) + MD(n) = f(n)$.
+
+\textbf{Case 2: The goal position of tile $t$ is column $c_i$}
+
+Since tile $t$ moves out of its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$ since $lc(n,c_i) - 1$, and $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + LC(n) + MD(n) = f(n)$.
+
+\textbf{Case 3: The goal position of tile $t$ is column $c_j$}
+
+Since tile $t$ moves into its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2$, since $lc(n,c_j) + 1$, but $MD(n') = MD(n) - 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + LC(n) + MD(n) = f(n)$.
+
+A similar argument can be made for vertical moves. Hence, $f(n') \geq f(n)$ for any possible successor $n'$ of any state $n$. Thus the linear conflict heuristic is consistent.
 \end{proof}
-\end{itemize}
 
 \section{Experimental Setup}
 To examine the empirical time and space complexity of the 4 different algorithms implemented in this project, we wrote a generator to generate 10 random \textbf{solvable}~\cite{solvable} test cases for each dimension $3 \times 3$, $4 \times 4$ and $5 \times 5$, and then run the 4 algorithms on these test cases. For practicality of the experiment, we set a time limit of $60$ seconds for each test case. To avoid too many time limit exceeded (TLE) cases, we set a limit to the generator such that it only generates test cases whose solution depth is at most $100$.
