@@ -1,5 +1,6 @@
 \documentclass{llncs}
-\usepackage{amsmath}  % this package needed for flalign
+\usepackage{amsmath}
+\usepackage[ruled,vlined]{algorithm2e}
 
 \begin{document}
 \title{CS3243 PROJECT 1 REPORT}
@@ -150,44 +151,50 @@ From the results, we can see that while all 4 algorithms manage to solve all 10 
 \newpage
 \section{Appendix}
 
-\subsection{Linear Conflict Algorithm:}
+\subsection{Linear Conflict Algorithm}
+\begin{definition}$ $\\
+	$s$ is the current state.\\
+	$c(t_j,r_i)$ is the number of conflicts in row $r_i$ that tile $t_j$ is in conflict with.\\
+	$lc(s, r_i)$ is the number of tiles that need be removed from row $r_i$ in order to resolve the linear conflicts of that row; $lc(s, c_i)$ is the number of tiles that need be removed from column $c_i$.\\
+	$LC(s)$ is the minimum number of additional moves necessary to resolve the linear conflicts in $s$.\\
+	$md(s, t_j)$ is Manhattan Distance of tile $t_j$.\\
+	$MD(s)$ is the sum of Manhattan Distances of all the tiles in $s$.
+\end{definition}
 
-we formalise the algorithm for calculating the linear conflict heuristic. \\
-Definitions: \\
-$c(t_j,r_i)$ is the number of conflicts in row $r_i$ that tile $t_j$ is in conflict with. \\
-$lc(s, r_i)$ is the number of tiles that must be removed from row $r_i$ in order to resolve the linear conflicts of that row. $lc(s, c_i)$ is the number of tiles that must be removed from column $c_i$.  \\
-$md(s, t_j)$ is the Manhattan Distance of tile $t_j$. \\
-$LC(s)$ is the minimum number of additional moves necessary to resolve the linear conflicts in the current state s.\\
-$MD(s)$ is the sum of the Manhattan Distances of all the tiles in s. \\
+\begin{algorithm}[H]
+	\For{$r_i \in \{1,...,n\}$}{
+		$lc(s, r_i) = 0$\;
+		\For{$t_j$ in row $r_i$}{
+			compute($c(t_j,r_i)$)\;
+		}
+		\While{not all $c(t_j,r_i) = 0$}{
+			$t_{max} = t_k$ where $c(t_k,r_i) = max(c(t_j,r_i)) \forall t_j$ in row $r_i$\;
+			\For{$t_k$ in conflict with $t_{max}$}{
+				$c(t_k,r_i) = c(t_k,r_i) - 1$\;
+			}
+			$c(t_{max},r_i) = 0$\;
+			$lc(s, r_i) = lc(s, r_i) + 1$\;
+		}
+	}
 
-\textbf{Algorithm: Begin} \\
- 
-For each row $r_i$, \\
-Set $lc(s, r_i) = 0$ \\
-Obtain $c(t_j,r_i)$ for each $t_j$ in the row.
+	\For{$c_i \in \{1,...,n\}$}{
+		repeat above\;
+	}
 
-Then, while there is a non-zero $c(t_j,r_i)$ value, \\
-    Find $max(c(t_k,r_i)) \ \forall t_k \in r_i$, call this tile $t_{max}$  \\
-    Then set $c(t_{max},r_i) = 0$ \\
-    And for any tile $t_k$ in conflict with $t_{max}$, $c(t_k,r_i) = c(t_k,r_i) - 1$ \\
-    and $lc(s, r_i)++$
+	$LC(s) = 2(\sum^n_{i=1} lc(s,r_i) + \sum^n_{j=1} lc(s,c_j))$\;
+	$MD(s) = \sum^{n^2}_{j=1, t_j \neq 0}md(s,t_j)$\;
+	$h(s) = MD(s) + LC(s)$\;
+	\caption{Linear Conflict Heuristic}
+\end{algorithm}
 
-Do the same for each column $c_j$ \\
-Then calculate $LC(s) = 2(\sum^K_{i=1} lc(s,r_i) + \sum^K_{j=1} lc(s,c_j))$
-and  $MD(s) = \sum^{K^2}_{j=1}md(s,t_j)$
-Then  $h(s) = MD(s) + LC(s)$. \\
-
-\textbf{Algorithm: End} \\
-
-Intuitively, we examine the puzzle state, row by row and column by column, and add to Manhattan Distance the minimum number of additional moves
-necessary to resolve the conflicts within each row and column.
+Intuitively, we examine the puzzle state, row by row and column by column, and add to Manhattan Distance the minimum number of additional moves necessary to resolve the conflicts within each row and column.
 
 \subsection{Full Proof of Consistency of Linear Conflict}
 We partition the proof of consistency into 2 parts. Since there are at most 4 successors of each node $n$, we partition the proof into when the action is along the row (left/right successors) and along the column (up/down successors).
 
 We assume that the Manhattan Distance is consistent.
 
-Let us first consider the successors obtained by moving along the row $r_i$ of the $k$-Puzzle. We observe that since along row $r_i$, tile $t$ is merely swapping places with an empty tile, it will not cause any change to the number of linear conflicts of that row.
+Let us first consider the successors obtained by moving along the row $r_i$ of the $k$-puzzle. We observe that since along row $r_i$, tile $t$ is merely swapping places with an empty tile, it will not cause any change to the number of linear conflicts of that row.
 
 WLOG, we denote $c_i$ as the initial column of a tile $n$ to be moved, and $c_j$ as the column tile $n$ moves to. In particular, if the move is valid, $c_j = c_i - 1, c_i + 1$.
 
@@ -208,7 +215,7 @@ Since neither column is the goal column, the number of linear conflicts does not
 
 \textbf{Case 2: The goal position of tile $t$ is column $c_i$}
 
-We only need consider the linear conflicts along the column $c_i$. Since tile $t$ moves out of its goal column, the number of linear conflicts could decrease if tile $t$ was in conflict with another tile along $c_i$, or stay the same if tile $t$ had no conflicts. This could reduce the number of tiles to be removed from column i, thus $lc(n',c_i) =lc(n,c_i)$ or $lc(n,c_i)-1 = lc(n',c_i)$. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2 \implies LC(n') + 2 \geq LC(n)$. Since it will take $1$ more move to move tile $n$ back to its goal, $MD(n') = MD(n) + 1$. Thus we have:
+We only need consider the linear conflicts along the column $c_i$. Since tile $t$ moves out of its goal column, the number of linear conflicts could decrease if tile $t$ was in conflict with another tile along $c_i$, or stay the same if tile $t$ had no conflicts. This could reduce the number of tiles to be removed from column $i$, thus $lc(n',c_i) =lc(n,c_i)$ or $lc(n',c_i) = lc(n,c_i)-1$. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2 \implies LC(n') + 2 \geq LC(n)$. Since it will take $1$ more move to move tile $n$ back to its goal, $MD(n') = MD(n) + 1$. Thus we have:
 \begin{align}
     f(n') \nonumber
     	&= g(n') + h(n') \\\nonumber
@@ -221,7 +228,7 @@ We only need consider the linear conflicts along the column $c_i$. Since tile $t
 
 \textbf{Case 3: The goal position of tile $t$ is column $c_j$}
 
-We only need to consider the linear conflicts along the column $c_j$. Since tile $t$ moves into its goal column, the number of linear conflicts could increase if tile $t$ is now in conflict with some tile along $c_j$, or stay the same if tile $t$ does not create conflicts in its new position. This could increase the number of tiles to be removed from column i, thus $lc(n',c_j) =lc(n,c_j)$ or $lc(n,c_j)+1 = lc(n',c_j)$. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2 \implies LC(n') \geq LC(n)$. Since it takes $1$ less move to move tile $n$ back to its goal, $MD(n') = MD(n) - 1$. Thus we have:
+We only need to consider the linear conflicts along the column $c_j$. Since tile $t$ moves into its goal column, the number of linear conflicts could increase if tile $t$ is now in conflict with some tile along $c_j$, or stay the same if tile $t$ does not create conflicts in its new position. This could increase the number of tiles to be removed from column $i$, thus $lc(n',c_j) =lc(n,c_j)$ or $lc(n',c_j) = lc(n,c_j)+1$. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2 \implies LC(n') \geq LC(n)$. Since it takes $1$ less move to move tile $n$ back to its goal, $MD(n') = MD(n) - 1$. Thus we have:
 \begin{align}
     f(s') \nonumber &= g(n') + h(n') \\\nonumber
         &= c(n,n') + g(n) + LC(n') + MD(n') \\\nonumber
@@ -233,12 +240,11 @@ We only need to consider the linear conflicts along the column $c_j$. Since tile
 
 Therefore for all cases along the row of the puzzle, $f(n') \geq f(n)$. 
 
-A similar argument can be made for the actions along the column of the $k$-Puzzle, by rotating the grid and interchanging the roles of rows and columns .
+A similar argument can be made for the actions along the column of the $k$-puzzle, by rotating the grid and interchanging the roles of rows and columns .
 
 Thus $f(n') \geq f(n)$ for all possible successors of any state. This proves the consistency of Linear Conflict heuristic.
 
-\subsection{Solvability of $k$-Puzzle}
-The idea for the solvability of the $k$-Puzzle is taken from \cite{solvable}.
+\subsection{Solvability of $k$-puzzle~\cite{solvable}}
 \begin{definition}
 Flatten the $n \times n$ grid to a sequence of numbers, a pair of numbers $(a,b)$ is called an inversion if $a>b$ but $a$ comes before $b$ in the sequence. Inversion number of $k$-puzzle is the total number of inversions in the grid.
 \end{definition}
