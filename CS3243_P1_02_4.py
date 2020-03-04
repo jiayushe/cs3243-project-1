@@ -97,6 +97,18 @@ class Puzzle(object):
                     goal_pos_k = self.goal_position[state[row*self.N + k]]
                     if (goal_pos_j // self.N == row) and (goal_pos_j // self.N == goal_pos_k // self.N) and (goal_pos_j % self.N < goal_pos_k % self.N):
                         count += 1
+        for col in range(self.N):
+            for k in range(self.N):
+                if state[k*self.N + col] == 0:
+                    continue
+                for j in range(k+1, self.N):
+                    if state[j*self.N + col] == 0:
+                        continue
+                    # now t_j is guaranteed to be on the same line, bottom of t_k
+                    goal_pos_j = self.goal_position[state[j*self.N + col]]
+                    goal_pos_k = self.goal_position[state[k*self.N + col]]
+                    if (goal_pos_j % self.N == col) and (goal_pos_j % self.N == goal_pos_k % self.N) and (goal_pos_j // self.N < goal_pos_k // self.N):
+                        count += 1
         return count * 2 + self.manhattan_distance(state)
 
     def heuristic(self, state):
