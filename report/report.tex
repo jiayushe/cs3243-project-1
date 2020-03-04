@@ -81,7 +81,11 @@ We assume that the heuristic used in A* is consistent, i.e. $h(n')+c(n,n') \geq 
 	\item[] \textbf{Space complexity}: $O(b^d)$, where $d$ is depth of the goal node.
 \end{itemize}
 
-\subsection{Heuristic 1 \& 2 - Misplaced Tiles \& Manhattan Distance}
+\subsection{Heuristic 1 - Misplaced Tiles}
+
+Proof of consistency is given in AIMA, page 105~\cite{aima}.
+
+\subsection{Heuristic 2 - Manhattan Distance}
 
 Proof of consistency is given in AIMA, page 105~\cite{aima}.
 
@@ -111,32 +115,29 @@ Since tile $t$ moves into its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) +
 \end{itemize}
 
 \section{Experimental Setup}
-To examine the empirical time and space complexity of the 4 different algorithms implemented in this project, we wrote a generator to generate 10 random \textbf{solvable}~\cite{solvable} test cases for each dimension $3 \times 3$, $4 \times 4$ and $5 \times 5$, and then run the 4 algorithms on these test cases. For practicality of the experiment, we set a time limit of $60$ seconds for each test case. To avoid too many time limit exceeded (TLE) cases, we set a limit to the generator such that it only generates test cases whose solution depth is at most $100$.
+To empirically examine the 4 different algorithms implemented in this project, we write a script to generate 10 random test cases for each dimension $3 \times 3$, $4 \times 4$ and $5 \times 5$, and then run the 4 algorithms on these test cases. For practicality of the experiment, we set a time limit of $60$ seconds for each test case. To avoid too many time limit exceeded cases, we set a limit to the script such that it only generates test cases whose solution depth is at most $100$.
 
 We measure the solution depth, search depth, number of explored states, number of generated states, maximum heap size and runtime for each test case.
-
-The number of explored/generated states and maximum heap size are used to assess the empirical space complexity while runtime is used to assess the empirical time complexity.
 
 \section{Results and Discussion}
 \begin{table}
 	\centering
-	\begin{tabular}{l|c|c|c|c|c|c|c|c|c|c|c|c} \hline
-		Dimension & \multicolumn{4}{c|}{$3 \times 3$} & \multicolumn{4}{c|}{$4 \times 4$} & \multicolumn{4}{c}{$5 \times 5$} \\\hline
-		Solution & $1$ & $2$ & $3$ & $4$ & $1$ & $2$ & $3$ & $4$ & $1$ & $2$ & $3$ & $4$ \\\hline
-		Pass Rate(\%) & 100 & 100 & 100 & 100 & 0 & 70 & 100 & 100 & 0 & 40 & 90 & 90 \\\hline
-		Ave Solution Depth & 14.6 & 14.6 & 14.6 & 14.6 & - & 25.4 & 28.2 & 28.2 & - & 28.5 & 33.8 & 33.8 \\\hline
-		Ave Search Depth & 14.6 & 14.6 & 14.6 & 14.6 & - & 25.4 & 28.2 & 28.2 & - & 28.5 & 33.8 & 33.8 \\\hline
-		Ave Explored States & 10461.9 & 594.5 & 119.6 & 68.5 & - & 93122.4 & 25607.9 & 3486.7 & - & 95769 & 63719 & 9652.6 \\\hline
-		Ave Generated States & 10461.9 & 948.6 & 197.2 & 116 & - & 177991.7 & 48460.2 & 6692.5 & - & 208102.5 & 136932.4 & 21830 \\\hline
-		Ave Heap size & 3516.4 & 356.2 & 79.2 & 48.8 & - & 85254.9 & 23307.5 & 3270.5 & - & 112753 & 74193.9 & 12291.1 \\\hline
-		Ave Runtime(s) & 0.201 & 0.0931 & 0.0773 & 0.0881 & - & 4.78 & 2.14 & 1.03 & - & 5.68 & 7.52 & 5.28 \\\hline
-		Runtime SD(s) & 0.0157 & 0.0253 & 0.00856 & 0.0154 & - & 6.29 & 4.65 & 1.35 & - & 7.46 & 18.0 & 11.6 \\\hline
-		Max Runtime(s) & 0.631 & 0.153 & 0.0916 & 0.119 & - & 19.1 & 15.8 & 4.58 & - & 18.4 & 58.1 & 38.0 \\\hline
+	\begin{tabular}{l|l|l|l} \hline
+		Dimension & $3 \times 3$ & $4 \times 4$ & $5 \times 5$ \\\hline
+		Pass Rate &  &  & \\
+		Ave Solution Depth &  &  & \\
+		Ave Search Depth &  &  & \\
+		Ave Explored States &  &  & \\
+		Ave Generated States &  &  & \\
+		Ave Heap size &  &  & \\
+		Ave Runtime &  &  & \\
+		Runtime Standard Dev &  &  & \\
+		Max Runtime &  &  & \\
+		\hline
 	\end{tabular}
 	\caption{Experimental results}
 	\label{tab:one}
 \end{table}
-From the results, we can see that while all 4 algorithms manage to solve all 10 $3 \times 3$ puzzles, BFS got TLE for all $4 \times 4$ and $5 \times 5$ test cases. Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile in terms of pass rate and both time and space complexity. Between MD and LC, LC outperformed MD in terms of both time and space complexity. This is consistent with the fact that LC dominates MD. There is an exception for the runtime for $3 \times 3$, this is most likely due to the overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
 
 \newpage
 
@@ -234,7 +235,7 @@ A similar argument can be made for the actions along the column of the $k$-Puzzl
 Thus $f(n') \geq f(n)$ for all possible successors of any state. This proves the consistency of Linear Conflict heuristic.
 
 \subsection{Solvability of $k$-Puzzle}
-The idea for the solvability of the $k$-Puzzle is taken from \cite{solvability}.
+The idea for the solvability of the $k$-Puzzle is taken from \cite{solvable}.
 \begin{definition}
 Flatten the $n \times n$ grid to a sequence of numbers, a pair of numbers $(a,b)$ is called an inversion if $a>b$ but $a$ comes before $b$ in the sequence. Inversion number of $k$-puzzle is the total number of inversions in the grid.
 \end{definition}
@@ -332,20 +333,6 @@ By \textbf{Lemma 4}, we know that horizontal moves do not change the inversion n
 
 If the initial state has an odd inversion number and the empty cell is on an odd-numbered row, then any vertical move made will result in an even inversion number with the empty cell on an even-numbered row, and vice versa. Therefore, if an initial state starts with an odd inversion number and the empty cell is on an odd-numbered row, it can never have an even inversion numbers with the empty cell on an odd-numbered row, and thus never reach the goal state. Therefore such puzzles are unsolvable.
 \end{proof}
-
-
-\begin{thebibliography}{9}
-\bibitem{solvability} 
-Mark Ryan. 
-Solvability of the Tiles Game.
-\\\texttt{https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html}
-\bibitem{lc} 
-Othar Hansson, Andrew E. Mayer and Mordechai M. Yung. 
-Generating Admissible Heuristics by
-Criticizing Solutions to Relaxed Models,
-\\\texttt{https://academiccommons.columbia.edu/doi/10.7916/D8154QZT/download}
-
-\end{thebibliography}
 
 
 \end{document}
