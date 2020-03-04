@@ -91,31 +91,28 @@ Proof of consistency is given in AIMA, page 105~\cite{aima}.
 
 \subsection{Heuristic 3 - Linear Conflict}
 
+\begin{itemize}
+\item[] The definition of linear conflict, the algorithm, and the idea for the proof is taken from \cite{lc}.
+\item[]The full algorithm for calculating the linear conflict heuristic is given in the appendix.
+
 \begin{definition}
 Two tiles $t_j$ and $t_k$ are in a linear conflict if $t_j$ and $t_k$ are in the same line, the goal positions of $t_j$ and $t_k$ are both in that line, $t_j$ is to the right of $t_k$, and the goal position of $t_j$ is to the left of the goal position of $t_k$.
 \end{definition}
 
-The estimated cost of node $n$ by Linear Conflict heuristic is $h(n) = LC(n) + MD(n)$, where $MD(n)=\sum md(n,t_j)$ is the estimated cost given by Manhattan Distance heuristic, $LC(n) = 2\sum[lc(n,r_i) +lc(n,c_j)]$ is 2 times the number of linear conflicts in the rows and columns.
-
-\textbf{Proof of Consistency}
-
-Consider the successor of a state obtained by moving a tile $t$ left or right along row $r_i$ of the $k$-puzzle. Since along $r_i$ tile $n$ is merely swapping places with an empty cell, it will not cause any change to the number of linear conflicts of that row.
-
+The estimated cost of node $n$ by Linear Conflict heuristic is $h(n) = LC(n) + MD(n)$, where $MD(n)=\sum md(n,t_j)$ is the estimated cost given by Manhattan Distance heuristic, $LC(n) = 2\sum[lc(n,r_i) +lc(n,c_j)]$ where $lc(n,r_i)$ is the number of tiles to be removed from row i to attain 0 linear conflicts.
+\begin{proof}
+Consider the successor of a state obtained by moving a tile $t$ left or right along row $r_i$ of the $k$-puzzle. Since along $r_i$ tile $t$ is merely swapping places with an blank, number of linear conflicts of that row remains the same.
 Denote $c_i$ as the initial column and $c_j$ as the goal column. Now we consider 3 mutually exclusive cases for horizontal moves.
-
-\textbf{Case 1: The goal position of tile $t$ is neither on column $c_i$ nor $c_j$}
-
+\item[]\textbf{Case 1: The goal position of tile $t$ is neither on column $c_i$ nor $c_j$} \\
 Since neither column is the goal column, we have $LC(n') = LC(n)$ and $MD(n') = MD(n) \pm 1$, so $f(n') = 1 + g(n) + LC(n) + MD(n') \geq g(n) + LC(n) + MD(n) = f(n)$.
+\item[]\textbf{Case 2: The goal position of tile $t$ is column $c_i$} \\
+Since tile $t$ moves out of its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$ since $lc(n,c_i) - 1$, and $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + LC(n) + MD(n) = f(n)$.
+\item[]\textbf{Case 3: The goal position of tile $t$ is column $c_j$} \\
+Since tile $t$ moves into its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2$, since $lc(n,c_j) + 1$, but $MD(n') = MD(n) - 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + LC(n) + MD(n) = f(n)$.  \\
 
-\textbf{Case 2: The goal position of tile $t$ is column $c_i$}:
-
-Since tile $t$ moves out of its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2$, and $MD(n') = MD(n) + 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) + 1 \geq g(n) + LC(n) + MD(n) = f(n)$.
-
-\textbf{Case 3: The goal position of tile $t$ is column $c_j$}:
-
-Since tile $t$ moves into its goal column, $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2$, but $MD(n') = MD(n) - 1$. Thus we have $f(n') = 1 + g(n) + LC(n') + MD(n) - 1 \geq g(n) + LC(n) + MD(n) = f(n)$.
-
-A similar argument can be made for vertical moves. Hence, $f(n') \geq f(n)$ for any possible successor $n'$ of any state n. This proves the consistency.
+\item[]A similar argument can be made for vertical moves. Hence, $f(n') \geq f(n)$ for any possible successor $n'$ of any state n. Thus the linear conflict heuristic is consistent.
+\end{proof}
+\end{itemize}
 
 \section{Experimental Setup}
 To empirically examine the 4 different algorithms implemented in this project, we write a script to generate 10 random test cases for each dimension $3 \times 3$, $4 \times 4$ and $5 \times 5$, and then run the 4 algorithms on these test cases. For practicality of the experiment, we set a time limit of $60$ seconds for each test case. To avoid too many time limit exceeded cases, we set a limit to the script such that it only generates test cases whose solution depth is at most $100$.
@@ -149,6 +146,39 @@ We measure the solution depth, search depth, number of explored states, number o
 
 \newpage
 \section{Appendix}
+
+\subsection{Linear Conflict Algorithm:}
+
+we formalise the algorithm for calculating the linear conflict heuristic. \\
+Definitions: \\
+$c(t_j,r_i)$ is the number of conflicts in row $r_i$ that tile $t_j$ is in conflict with. \\
+$lc(s, r_i)$ is the number of tiles that must be removed from row $r_i$ in order to resolve the linear conflicts of that row. $lc(s, c_i)$ is the number of tiles that must be removed from column $c_i$.  \\
+$md(s, t_j)$ is the Manhattan Distance of tile $t_j$. \\
+$LC(s)$ is the minimum number of additional moves necessary to resolve the linear conflicts in the current state s.\\
+$MD(s)$ is the sum of the Manhattan Distances of all the tiles in s. \\
+
+\textbf{Algorithm: Begin} \\
+ 
+For each row $r_i$, \\
+Set $lc(s, r_i) = 0$ \\
+Obtain $c(t_j,r_i)$ for each $t_j$ in the row.
+
+Then, while there is a non-zero $c(t_j,r_i)$ value, \\
+    Find $max(c(t_k,r_i)) \ \forall t_k \in r_i$, call this tile $t_{max}$  \\
+    Then set $c(t_{max},r_i) = 0$ \\
+    And for any tile $t_k$ in conflict with $t_{max}$, $c(t_k,r_i) = c(t_k,r_i) - 1$ \\
+    and $lc(s, r_i)++$
+
+Do the same for each column $c_j$ \\
+Then calculate $LC(s) = 2(\sum^K_{i=1} lc(s,r_i) + \sum^K_{j=1} lc(s,c_j))$
+and  $MD(s) = \sum^{K^2}_{j=1}md(s,t_j)$
+Then  $h(s) = MD(s) + LC(s)$. \\
+
+\textbf{Algorithm: End} \\
+
+Intuitively, we examine the puzzle state, row by row and column by column, and add to Manhattan Distance the minimum number of additional moves
+necessary to resolve the conflicts within each row and column.
+
 \subsection{Full Proof of Consistency of Linear Conflict}
 We partition the proof of consistency into 2 parts. Since there are at most 4 successors of each node $n$, we partition the proof into when the action is along the row (left/right successors) and along the column (up/down successors).
 
@@ -162,7 +192,7 @@ Now we consider 3 mutually exclusive cases for tile $n$ and prove consistency fo
 
 \textbf{Case 1: The goal position of tile $t$ is neither on column $c_i$ nor $c_j$}
 
-Since neither column is the goal column, the number of linear conflicts does not change, $LC(n') = LC(n)$. Besides, $MD(n') = MD(n) \pm 1 \implies MD(n') + 1 \geq MD(n)$. Thus we have:
+Since neither column is the goal column, the number of linear conflicts does not change, so no extra tile needs to be moved, and thus $LC(n') = LC(n)$. Besides, $MD(n') = MD(n) \pm 1 \implies MD(n') + 1 \geq MD(n)$. Thus we have:
 \begin{align}
     f(n') \nonumber
     	&= g(n') + h(n') \\\nonumber
@@ -175,7 +205,7 @@ Since neither column is the goal column, the number of linear conflicts does not
 
 \textbf{Case 2: The goal position of tile $t$ is column $c_i$}
 
-We only need consider the linear conflicts along the column $c_i$. Since tile $t$ moves out of its goal column, the number of linear conflicts could decrease by $1$ if tile $t$ was in conflict with another tile along $c_i$, or stay the same if tile $t$ had no conflicts. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2 \implies LC(n') + 2 \geq LC(n)$. Since it will take $1$ more move to move tile $n$ back to its goal, $MD(n') = MD(n) + 1$. Thus we have:
+We only need consider the linear conflicts along the column $c_i$. Since tile $t$ moves out of its goal column, the number of linear conflicts could decrease if tile $t$ was in conflict with another tile along $c_i$, or stay the same if tile $t$ had no conflicts. This could reduce the number of tiles to be removed from column i, thus $lc(n',c_i) =lc(n,c_i)$ or $lc(n,c_i)-1 = lc(n',c_i)$. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) - 2 \implies LC(n') + 2 \geq LC(n)$. Since it will take $1$ more move to move tile $n$ back to its goal, $MD(n') = MD(n) + 1$. Thus we have:
 \begin{align}
     f(n') \nonumber
     	&= g(n') + h(n') \\\nonumber
@@ -188,7 +218,7 @@ We only need consider the linear conflicts along the column $c_i$. Since tile $t
 
 \textbf{Case 3: The goal position of tile $t$ is column $c_j$}
 
-We only need to consider the linear conflicts along the column $c_j$. Since tile $t$ moves into its goal column, the number of linear conflicts could increase by $1$ if tile $t$ is now in conflict with some tile along $c_j$, or stay the same if tile $t$ does not create conflicts in its new position. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2 \implies LC(n') \geq LC(n)$. Since it takes $1$ less move to move tile $n$ back to its goal, $MD(n') = MD(n) - 1$. Thus we have:
+We only need to consider the linear conflicts along the column $c_j$. Since tile $t$ moves into its goal column, the number of linear conflicts could increase if tile $t$ is now in conflict with some tile along $c_j$, or stay the same if tile $t$ does not create conflicts in its new position. This could increase the number of tiles to be removed from column i, thus $lc(n',c_j) =lc(n,c_j)$ or $lc(n,c_j)+1 = lc(n',c_j)$. Thus $LC(n') = LC(n)$ or $LC(n') = LC(n) + 2 \implies LC(n') \geq LC(n)$. Since it takes $1$ less move to move tile $n$ back to its goal, $MD(n') = MD(n) - 1$. Thus we have:
 \begin{align}
     f(s') \nonumber &= g(n') + h(n') \\\nonumber
         &= c(n,n') + g(n) + LC(n') + MD(n') \\\nonumber
@@ -205,6 +235,7 @@ A similar argument can be made for the actions along the column of the $k$-Puzzl
 Thus $f(n') \geq f(n)$ for all possible successors of any state. This proves the consistency of Linear Conflict heuristic.
 
 \subsection{Solvability of $k$-Puzzle}
+The idea for the solvability of the $k$-Puzzle is taken from \cite{solvability}.
 \begin{definition}
 Flatten the $n \times n$ grid to a sequence of numbers, a pair of numbers $(a,b)$ is called an inversion if $a>b$ but $a$ comes before $b$ in the sequence. Inversion number of $k$-puzzle is the total number of inversions in the grid.
 \end{definition}
@@ -302,4 +333,20 @@ By \textbf{Lemma 4}, we know that horizontal moves do not change the inversion n
 
 If the initial state has an odd inversion number and the empty cell is on an odd-numbered row, then any vertical move made will result in an even inversion number with the empty cell on an even-numbered row, and vice versa. Therefore, if an initial state starts with an odd inversion number and the empty cell is on an odd-numbered row, it can never have an even inversion numbers with the empty cell on an odd-numbered row, and thus never reach the goal state. Therefore such puzzles are unsolvable.
 \end{proof}
+
+
+\begin{thebibliography}{9}
+\bibitem{solvability} 
+Mark Ryan. 
+Solvability of the Tiles Game.
+\\\texttt{https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html}
+\bibitem{lc} 
+Othar Hansson, Andrew E. Mayer and Mordechai M. Yung. 
+Generating Admissible Heuristics by
+Criticizing Solutions to Relaxed Models,
+\\\texttt{https://academiccommons.columbia.edu/doi/10.7916/D8154QZT/download}
+
+\end{thebibliography}
+
+
 \end{document}
