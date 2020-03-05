@@ -136,7 +136,7 @@ class Puzzle(object):
                         continue
                     if j in C[k]:
                         C[k].remove(j)
-                        lc += 1
+                lc += 1
             count += lc
         return count * 2 + self.manhattan_distance(state)
 
