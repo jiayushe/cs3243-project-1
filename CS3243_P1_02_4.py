@@ -87,7 +87,7 @@ class Puzzle(object):
         count = 0
         for row in range(self.N): # for each row r_i
             lc = 0
-            C = [[]] * self.N
+            C = [[] for i in range(self.N)]
             for k in range(self.N): # for each tile t_k in row r_i, calculate C
                 if state[row*self.N + k] == 0:
                     continue
@@ -112,32 +112,32 @@ class Puzzle(object):
                 lc += 1
             count += lc
 
-        # for col in range(self.N):
-        #     lc = 0
-        #     C = [[]] * self.N
-        #     for k in range(self.N):
-        #         if state[k*self.N + col] == 0:
-        #             continue
-        #         for j in range(k+1, self.N):
-        #             if state[j*self.N + col] == 0:
-        #                 continue
-        #             # now t_j is guaranteed to be on the same line, bottom of t_k
-        #             goal_pos_j = self.goal_position[state[j*self.N + col]]
-        #             goal_pos_k = self.goal_position[state[k*self.N + col]]
-        #             if (goal_pos_j % self.N == col) and (goal_pos_j % self.N == goal_pos_k % self.N) and (goal_pos_j // self.N < goal_pos_k // self.N):
-        #                 C[k].append(j)
-        #                 C[j].append(k)
-        #     while not all(len(v)==0 for v in C):
-        #         lens = [len(v) for v in C]
-        #         j = lens.index(max(lens))
-        #         C[j] = []
-        #         for k in range(self.N):
-        #             if state[k*self.N + col] == 0:
-        #                 continue
-        #             if j in C[k]:
-        #                 C[k].remove(j)
-        #         lc += 1
-        #     count += lc
+        for col in range(self.N):
+            lc = 0
+            C = [[] for i in range(self.N)]
+            for k in range(self.N):
+                if state[k*self.N + col] == 0:
+                    continue
+                for j in range(k+1, self.N):
+                    if state[j*self.N + col] == 0:
+                        continue
+                    # now t_j is guaranteed to be on the same line, bottom of t_k
+                    goal_pos_j = self.goal_position[state[j*self.N + col]]
+                    goal_pos_k = self.goal_position[state[k*self.N + col]]
+                    if (goal_pos_j % self.N == col) and (goal_pos_j % self.N == goal_pos_k % self.N) and (goal_pos_j // self.N < goal_pos_k // self.N):
+                        C[k].append(j)
+                        C[j].append(k)
+            while not all(len(v)==0 for v in C):
+                lens = [len(v) for v in C]
+                j = lens.index(max(lens))
+                C[j] = []
+                for k in range(self.N):
+                    if state[k*self.N + col] == 0:
+                        continue
+                    if j in C[k]:
+                        C[k].remove(j)
+                        lc += 1
+            count += lc
         return count * 2 + self.manhattan_distance(state)
 
     def heuristic(self, state):
