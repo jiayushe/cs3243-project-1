@@ -64,6 +64,16 @@ def move(N, state, action):
         raise Exception("Illegal action found in move function: " + action)
     return tuple(new_state)
 
+def verify_solution(N, init_state, moves):
+    curr_state = init_state
+    goal_state_dict = {3: (1, 2, 3, 4, 5, 6, 7, 8, 0),\
+                       4: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0),\
+                       5: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)}
+    move_dict = {"LEFT": 1, "RIGHT": 2, "UP": 3, "DOWN": 4}
+    for move in moves:
+        curr_state = move(N, curr_state, move_dict[move])
+    return curr_state == goal_state_dict[N]
+
 def generate_puzzle(n):
     init_state = None
     if n == 3:
