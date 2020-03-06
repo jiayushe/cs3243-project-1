@@ -56,7 +56,7 @@ We assume that the heuristic used in A* is consistent, i.e. $h(n')+c(n,n') \geq 
 	Any finite graph search algorithm using a frontier queue is complete~\cite{sertac}.
 	\end{lemma} 
 	\begin{proof} 
-	By induction on $n$, the number of steps from root $s$ to goal node $g$. \emph{Base case}: When $n=1$, $s$ is one step away from $g$, at the first step of such an algorithm will $g$ be added to the queue, so it is complete. \emph{Inductive step}: Suppose the lemma is true for $n=k$, consider the case for $n=k+1$. Since the $g$ is reachable from $s$, when adding the neighbors of $s$ to the queue, there exists at least one neighbor that can reach $g$ and is $k$ steps away from $g$. By the inductive hypothesis, the algorithm is complete. 
+	By induction on $n$, the number of steps from root $s$ to goal node $g$. \emph{Base case}: When $n=1$, $s$ is one step away from $g$, at the first step of such an algorithm $g$ will be added to the queue, so it is complete. \emph{Inductive step}: Suppose the lemma is true for $n=k$, consider the case for $n=k+1$. Since the $g$ is reachable from $s$, when adding the neighbors of $s$ to the queue, there exists at least one neighbor that can reach $g$ and is $k$ steps away from $g$. By the inductive hypothesis, the algorithm is complete. 
 	\end{proof}
 	\item[] \textbf{Optimality}
 	\begin{lemma} 
@@ -97,7 +97,7 @@ Two tiles $t_j$ and $t_k$ are in a linear conflict if $t_j$ and $t_k$ are in the
 
 The estimated cost of node $n$ by Linear Conflict heuristic is $h(n) = LC(n) + MD(n)$, where $MD(n)=\sum md(n,t_j)$ is the estimated cost given by Manhattan Distance heuristic, $LC(n) = 2\sum[lc(n,r_i) +lc(n,c_j)]$ where $lc(n,r_i)$ is the number of tiles to be removed from row i to attain 0 linear conflicts.
 \begin{proof}
-Consider the successor of a state obtained by moving a tile $t$ left or right along row $r_i$ of the $k$-puzzle. Since along $r_i$ tile $t$ is merely swapping places with an blank, number of linear conflicts of that row remains the same.
+Consider the successor of a state obtained by moving a tile $t$ left or right along row $r_i$ of the $k$-puzzle. Since along $r_i$ tile $t$ is merely swapping places with a blank, number of linear conflicts of that row remains the same.
 Denote $c_i$ as the initial column and $c_j$ as the goal column. Now we consider 3 mutually exclusive cases for horizontal moves.
 
 \textbf{Case 1: The goal position of tile $t$ is neither on column $c_i$ nor $c_j$}
@@ -141,7 +141,7 @@ The number of explored/generated states and maximum heap size are used to assess
 	\caption{Experimental results}
 	\label{tab:one}
 \end{table}
-From the results, we can see that while all 4 algorithms manage to solve all 10 $3 \times 3$ puzzles, BFS got TLE for all $4 \times 4$ and $5 \times 5$ test cases. Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile in terms of pass rate and both time and space complexity. Between MD and LC, LC outperformed MD in terms of both time and space complexity. This is consistent with the fact that LC dominates MD. There is an exception for the runtime for $3 \times 3$, this is most likely due to the overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
+From the results, we can see that while all 4 algorithms manage to solve all 10 $3 \times 3$ puzzles, BFS got TLE for all $4 \times 4$ and $5 \times 5$ test cases. Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile (MT) in terms of pass rate and both time and space complexity since MT is the most relaxed algorithm. Between MD and LC, LC outperformed MD in terms of both time and space complexity. This is consistent with the fact that LC dominates MD. There is an exception for the runtime for $3 \times 3$, this is most likely due to the overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
 
 \newpage
 
