@@ -78,7 +78,7 @@ We assume that the heuristic used in A* is consistent, i.e. $h(n')+c(n,n') \geq 
 
 \subsubsection{Complexity}
 \begin{itemize}
-	\item[] \textbf{Time complexity}: $O(b^{f^*(g)-f(g)})$, where $b$ is the branching factor and $f^*(g)$ is the actual cost from root $s$ to goal node $g$.
+	\item[] \textbf{Time complexity}: $O(b^{f^*(s)-f(s)})$, where $b$ is the branching factor and $f^*(s)$ is the actual cost from root $s$ to goal node $g$.
 	\item[] \textbf{Space complexity}: $O(b^d)$, where $d$ is depth of the goal node.
 \end{itemize}
 
@@ -146,7 +146,7 @@ To assess the empirical time complexity, we measure the search depth and runtime
 \vspace*{-30pt}
 From the results, we can see that while all 4 algorithms manage to solve all 10 $3 \times 3$ puzzles, BFS had TLE for all $4 \times 4$ and $5 \times 5$ test cases.
 
-Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile (MT) in terms of pass rate and both time and space complexity since MT is optimal to the most relaxed problem \footnote{tiles can move to any place in one move}. Between MD and LC, LC outperformed MD in terms of both time and space complexity. This is consistent with the fact that LC dominates MD. There is an exception for the runtime of $3 \times 3$, this is most likely due to the combination of small absolute difference (~60 rather than 10000+ for other cases) in generated/explored states and overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
+Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile (MT) in terms of pass rate and both time and space complexity since MT is optimal to the most relaxed problem \footnote{Tiles can move to any place in one move.}. Between MD and LC, LC outperformed MD in terms of both time and space complexity. This is consistent with the fact that LC dominates MD. There is an exception for the runtime of $3 \times 3$, this is most likely due to the combination of small absolute difference (~60 rather than 10000+ for other cases) in generated/explored states and overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
 
 \newpage
 
