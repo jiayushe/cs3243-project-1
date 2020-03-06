@@ -78,8 +78,8 @@ We assume that the heuristic used in A* is consistent, i.e. $h(n')+c(n,n') \geq 
 
 \subsubsection{Complexity}
 \begin{itemize}
-	\item[] \textbf{Time complexity}: $O(b^{f^*(s)-f(s)})$, where $b$ is the branching factor and $f^*(s)$ is the actual cost from root $s$ to goal node $g$.
-	\item[] \textbf{Space complexity}: $O(b^d)$, where $d$ is depth of the goal node.
+	\item[] \textbf{Time complexity}: $O(b^{h^*(s)-h(s)})$, where $b$ is the branching factor and $h^*(s)$ is the actual cost from root $s$ to goal node $g$.
+	\item[] \textbf{Space complexity}: $O(b^m)$, where $m$ is the maximum depth of the search tree.
 \end{itemize}
 
 \subsection{Heuristic 1 \& 2 - Misplaced Tiles \& Manhattan Distance}
