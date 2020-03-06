@@ -43,51 +43,79 @@ def number_to_move(move):
     else:
         return "DOWN"
 
-def move(N, state, action):
+def move_to_number(move):
+    if move == "LEFT":
+        return 1
+    elif move == "RIGHT":
+        return 2
+    elif move == "UP":
+        return 3
+    else:
+        return 4
+
+def move(n, state, action):
     new_state = list(state)
     index = new_state.index(0)
-    zr = index / N
-    zc = index % N
+    zr = index / n
+    zc = index % n
     if action == 1: # LEFT
-        new_state[index] = new_state[zr*N + zc + 1]
-        new_state[zr*N + zc + 1] = 0
+        new_state[index] = new_state[zr*n + zc + 1]
+        new_state[zr*n + zc + 1] = 0
     elif action == 2: # RIGHT
-        new_state[index] = new_state[zr*N + zc - 1]
-        new_state[zr*N + zc - 1] = 0
+        new_state[index] = new_state[zr*n + zc - 1]
+        new_state[zr*n + zc - 1] = 0
     elif action == 3: # UP
-        new_state[index] = new_state[(zr+1)*N + zc]
-        new_state[(zr+1)*N + zc] = 0
+        new_state[index] = new_state[(zr+1)*n + zc]
+        new_state[(zr+1)*n + zc] = 0
     elif action == 4: # DOWN
-        new_state[index] = new_state[(zr-1)*N + zc]
-        new_state[(zr-1)*N + zc] = 0
+        new_state[index] = new_state[(zr-1)*n + zc]
+        new_state[(zr-1)*n + zc] = 0
     else:
         raise Exception("Illegal action found in move function: " + action)
     return tuple(new_state)
 
-def verify_solution(N, init_state, moves):
-    curr_state = init_state
-    goal_state_dict = {3: (1, 2, 3, 4, 5, 6, 7, 8, 0),\
-                       4: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0),\
-                       5: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)}
-    move_dict = {"LEFT": 1, "RIGHT": 2, "UP": 3, "DOWN": 4}
-    for move in moves:
-        curr_state = move(N, curr_state, move_dict[move])
-    return curr_state == goal_state_dict[N]
+def read_puzzle(n, input_file):
+    lines = open(input_file, 'r').readlines()
+    init_state = [0 for i in range(n ** 2)]
+    max_num = n ** 2 - 1
+    i, j = 0, 0
+    for line in lines:
+        for number in line.split(" "):
+            if number == '':
+                continue
+            value = int(number)
+            if  0 <= value <= max_num:
+                init_state[i * n + j] = value
+                j += 1
+                if j == n:
+                    i += 1
+                    j = 0
+    return init_state
 
-def tsplit(string, delimiters):
-    # Behaves str.split but supports multiple delimiters
-    # from http://code.activestate.com/recipes/577616-split-strings-w-multiple-separators/v
-    delimiters = tuple(delimiters)
-    stack = [string,]
-    
-    for delimiter in delimiters:
-        for i, substring in enumerate(stack):
-            substack = substring.split(delimiter)
-            stack.pop(i)
-            for j, _substring in enumerate(substack):
-                stack.insert(i+j, _substring)
-    print(stack)
-    return stack
+def read_solution(output_file):
+    lines = open(output_file, 'r').readlines()
+    solution = []
+    for line in lines:
+        for move in line.split("\n"):
+            if move == '':
+                continue
+            solution.append(move)
+    return solution
+
+def verify_solution(n, init_state, moves):
+    curr_state = init_state
+    goal_state = None
+    if n == 3:
+        goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 0)
+    elif n == 4:
+        goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)
+    elif n == 5:
+        goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)
+    else:
+        raise Exception("Unexpected dimension.")
+    for m in moves:
+        curr_state = move(n, curr_state, move_to_number(m))
+    return curr_state == goal_state
 
 def generate_puzzle(n):
     init_state = None
@@ -98,16 +126,16 @@ def generate_puzzle(n):
     elif n == 5:
         init_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)
     else:
-        raise Exception("exception at generate_puzzle")
-    cur_state = init_state
+        raise Exception("Unexpected dimension.")
+    curr_state = init_state
     for i in range(100):
         r = random.randrange(4)+1
         action = number_to_move(r)
-        while not is_valid_action(n, cur_state, action):
+        while not is_valid_action(n, curr_state, action):
             r = random.randrange(4)+1
             action = number_to_move(r)
-        cur_state = move(n, cur_state, r)
-    return cur_state
+        curr_state = move(n, curr_state, r)
+    return curr_state
 
 def generate_input(dimension, sample_size, prefix):
     max_num = dimension ** 2
@@ -184,15 +212,11 @@ if __name__ == '__main__':
                 if return_code == 0:
                     runtime_arr.append(runtime)
                     stdout, stderr = process.communicate()
-                    input_f = open(prefix + str(cnt) + '.in','r')
-                    init_state = tuple(map(int, tsplit(input_f.read(),('\n',' '))[:-1]))
-                    moves_f = open(prefix + str(cnt) + '_' + str(solution_index) + '.out','r')
-                    moves_list = moves_f.read().split("\n")
-                    solution_correct = verify_solution(dimension, init_state, moves_list)
+                    init_state = read_puzzle(dimension, input_file)
+                    solution = read_solution(output_file)
+                    solution_correct = verify_solution(dimension, init_state, solution)
                     if not solution_correct:
-                        raise Exception("Solution incorrect: \n"\
-                                        + init_state + "\n" +\
-                                        moves_list)
+                        raise Exception("Solution incorrect: \n" + str(init_state) + "\n" + str(solution))
                         sys.exit(0)
                     res = stderr.split('\n')
                     solution_depth_arr.append(int(res[0].split(':')[1]))
