@@ -116,11 +116,11 @@ A similar argument can be made for vertical moves. Hence, $f(n') \geq f(n)$ for 
 \end{proof}
 
 \section{Experimental Setup}
-To examine the empirical time and space complexity of the 4 different algorithms implemented in this project, we wrote a generator to generate 10 random \textbf{solvable}~\cite{solvable} test cases for each dimension $3 \times 3$, $4 \times 4$ and $5 \times 5$, and then run the 4 algorithms on these test cases. For practicality of the experiment, we set a time limit of $60$ seconds for each test case. To avoid too many time limit exceeded (TLE) cases, the generator only generates test cases whose solution depth is at most $100$.
+To examine the empirical time and space complexity of the 4 different algorithms implemented in this project, we wrote a generator to generate 10 random \textbf{solvable}~\cite{solvable} test cases for each dimension $3 \times 3$, $4 \times 4$ and $5 \times 5$, and then run the 4 algorithms on these test cases. For practicality of the experiment, we set a time limit of $120$ seconds for each test case. To avoid too many time limit exceeded (TLE) cases, the generator only generates test cases whose solution depth is at most $100$.
 
-To assess the empirical space complexity, we measure the number of generated states and the maximum heap size \footnote{\label{heapnote}In the context of BFS, maximum heap size means maximum queue length.}. Note that since we adopt graph search, the memory consumption consists of both the \texttt{explored} set (reflected by number of generated states) and the \texttt{frontier} (reflected by maximum heap size).
+To assess the empirical space complexity, we measure the number of generated states and the maximum size of the frontier, both of which constitute memory consumption.
 
-To assess the empirical time complexity, we measure the search depth and runtime. Additionally, we measure the number of explored states and solution depth to further evaluate the efficiency \footnote{It should explore as few nodes in the frontier as possible.} of the informed search heuristics.
+To assess the empirical time complexity, we measure the search depth, runtime and pass rate. Additionally, we measure the number of explored states and solution depth to further evaluate the efficiency \footnote{It should explore as few nodes in the frontier as possible.} of the informed search heuristics.
 
 \section{Results and Discussion}
 \vspace*{-20pt}
@@ -130,23 +130,23 @@ To assess the empirical time complexity, we measure the search depth and runtime
 	\begin{tabular}{l|c|c|c|c|c|c|c|c|c|c|c|c} \hline
 		Dimension & \multicolumn{4}{c|}{$3 \times 3$} & \multicolumn{4}{c|}{$4 \times 4$} & \multicolumn{4}{c}{$5 \times 5$} \\\hline
 		Solution & $1$ & $2$ & $3$ & $4$ & $1$ & $2$ & $3$ & $4$ & $1$ & $2$ & $3$ & $4$ \\\hline
-		Pass Rate(\%) & 100 & 100 & 100 & 100 & 0 & 70 & 100 & 100 & 0 & 40 & 90 & 90 \\\hline
-		Avg Solution Depth & 14.6 & 14.6 & 14.6 & 14.6 & - & 25.4 & 28.2 & 28.2 & - & 28.5 & 33.8 & 33.8 \\\hline
-		Avg Search Depth & 14.6 & 14.6 & 14.6 & 14.6 & - & 25.4 & 28.2 & 28.2 & - & 28.5 & 33.8 & 33.8 \\\hline
-		Avg Explored States & 10461.9 & 594.5 & 119.6 & 68.5 & - & 93122.4 & 25607.9 & 3486.7 & - & 95769 & 63719 & 9652.6 \\\hline
-		Avg Generated States & 10461.9 & 948.6 & 197.2 & 116 & - & 177991.7 & 48460.2 & 6692.5 & - & 208102.5 & 136932.4 & 21830 \\\hline
-		Avg Heap size\footnotemark[\ref{heapnote}] & 3516.4 & 356.2 & 79.2 & 48.8 & - & 85254.9 & 23307.5 & 3270.5 & - & 112753 & 74193.9 & 12291.1 \\\hline
-		Avg Runtime(s) & 0.201 & 0.0931 & 0.0773 & 0.0881 & - & 4.78 & 2.14 & 1.03 & - & 5.68 & 7.52 & 5.28 \\\hline
-		Runtime SD(s) & 0.0157 & 0.0253 & 0.00856 & 0.0154 & - & 6.29 & 4.65 & 1.35 & - & 7.46 & 18.0 & 11.6 \\\hline
-		Max Runtime(s) & 0.631 & 0.153 & 0.0916 & 0.119 & - & 19.1 & 15.8 & 4.58 & - & 18.4 & 58.1 & 38.0 \\\hline
+		Pass Rate(\%) & 100 & 100 & 100 & 100 & 0 & 80 & 100 & 100 & 0 & 50 & 100 & 100 \\\hline
+		Avg Runtime(s) & 0.178 & 0.0840 & 0.0693 & 0.0789 & - & 17.4 & 1.83 & 1.09 & - & 19.4 & 13.4 & 13.5 \\\hline
+		Runtime Stdev(s) & 0.153 & 0.0211 & 0.00851 & 0.0191 & - & 35.0 & 4.39 & 1.58 & - & 28.4 & 25.2 & 26.8 \\\hline
+		Max Runtime(s) & 0.598 & 0.141 & 0.0853 & 0.124 & - & 109 & 14.9 & 5.36 & - & 74.5 & 73.4 & 86.6 \\\hline
+		Avg Solution Depth & 14.6 & 14.6 & 14.6 & 14.6 & - & 26.25 & 28.2 & 28.2 & - & 29.2 & 34.8 & 34.8 \\\hline
+		Avg Search Depth & 14.6 & 14.6 & 14.6 & 14.6 & - & 26.25 & 28.2 & 28.2 & - & 29.2 & 34.8 & 34.8 \\\hline
+		Avg Explored States & 10461.9 & 588.9 & 119.5 & 70.0 & - & 339809.6 & 24690.7 & 3628.9 & - & 320016.6 & 125896.0 & 25246.0 \\\hline
+		Avg Generated States & 10461.9 & 939.3 & 197.0 & 118.9 & - & 645075.1 & 46474.5 & 6970.0 & - & 727278.6 & 273628.9 & 54830.9 \\\hline
+		Avg Frontier size & 3516.4 & 352.5 & 79.1 & 50.1 & - & 306215.1 & 22223.5 & 3397.7 & - & 408309.8 & 149535.2 & 29974.7 \\\hline
 	\end{tabular}}\\
 	\caption{Experiment results}
 	\label{tab:one}
 \end{table}
 \vspace*{-30pt}
-From the results, we can see that while all 4 algorithms manage to solve all 10 $3 \times 3$ puzzles, BFS had TLE for all $4 \times 4$ and $5 \times 5$ test cases.
+From the results, we can see that while all 4 algorithms manage to solve all ten $3 \times 3$ puzzles within time limit. However, BFS had TLE for all $4 \times 4$ and $5 \times 5$ test cases.
 
-Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile (MT) in terms of pass rate and both time and space complexity since MT is optimal to the most relaxed problem \footnote{Tiles can move to any place in one move.}. Between MD and LC, LC outperformed MD in terms of both time and space complexity. This is consistent with the fact that LC dominates MD. There is an exception for the runtime of $3 \times 3$, this is most likely due to the combination of small absolute difference (~60 rather than 10000+ for other cases) in generated/explored states and overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
+Among the 3 informed search heuristics, Manhattan Distance (MD) and Linear Conflict (LC) performed better than Misplaced Tile (MT) as shown by the higher pass rate and smaller space complexity, since MT measures the cost to the most relaxed problem \footnote{Tiles can move to any place in one move.}. Between MD and LC, LC outperformed MD in terms of space complexity. This is consistent with the fact that LC dominates MD. However, the difference in runtime is negligible and MD even performed slightly better than LC for $3 \times 3$ and $5 \times 5$. This is most likely due to the overhead incurred in computing the estimated cost using LC, as it has a complexity of $O(n^3)$, where $n$ is the dimension of the grid.
 
 \newpage
 

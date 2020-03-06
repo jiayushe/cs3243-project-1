@@ -135,7 +135,7 @@ def maximum(lst):
 if __name__ == '__main__':
     init()
     random.seed(1)
-    time_limit = 60
+    time_limit = 120
     sample_size = 10
     result = []
     for dimension in [3, 4, 5]:
@@ -149,9 +149,10 @@ if __name__ == '__main__':
             echo_cyan('Solution = ' + str(solution_file))
             runtime_arr = []
             solution_depth_arr = []
+            search_depth_arr = []
             explored_states_arr = []
             generated_states_arr = []
-            max_heap_size_arr = []
+            frontier_size_arr = []
             for cnt in range(0, sample_size):
                 input_file = prefix + str(cnt) + '.in'
                 output_file = prefix + str(cnt) + '_' + str(solution_index) + '.out'
@@ -169,9 +170,10 @@ if __name__ == '__main__':
                     stdout, stderr = process.communicate()
                     res = stderr.split('\n')
                     solution_depth_arr.append(int(res[0].split(':')[1]))
-                    explored_states_arr.append(int(res[1].split(':')[1]))
-                    generated_states_arr.append(int(res[2].split(':')[1]))
-                    max_heap_size_arr.append(int(res[3].split(':')[1]))
+                    search_depth_arr.append(int(res[1].split(':')[1]))
+                    explored_states_arr.append(int(res[2].split(':')[1]))
+                    generated_states_arr.append(int(res[3].split(':')[1]))
+                    frontier_size_arr.append(int(res[4].split(':')[1]))
                     sys.stdout.write('Puzzle solved (' + str(runtime) + 's)\n')
                 else:
                     sys.stdout.write('Time limit exceeded (' + str(time_limit) + 's)\n')
@@ -186,23 +188,26 @@ if __name__ == '__main__':
             sys.stdout.write(str(maximum(runtime_arr)) + 's\n')
             echo_cyan('Average solution depth:')
             sys.stdout.write(str(mean(solution_depth_arr)) + '\n')
+            echo_cyan('Average search depth:')
+            sys.stdout.write(str(mean(search_depth_arr)) + '\n')
             echo_cyan('Average explored states:')
             sys.stdout.write(str(mean(explored_states_arr)) + '\n')
             echo_cyan('Average generated states:')
             sys.stdout.write(str(mean(generated_states_arr)) + '\n')
-            echo_cyan('Average max heap size:')
-            sys.stdout.write(str(mean(max_heap_size_arr)) + '\n')
+            echo_cyan('Average frontier size:')
+            sys.stdout.write(str(mean(frontier_size_arr)) + '\n')
             sys.stdout.write('\n')
             result.append(( "(%d, %d)" % (dimension, solution_index),
-                            pass_rate, 
-                            mean(runtime_arr), 
-                            stdev(runtime_arr), 
-                            maximum(runtime_arr), 
-                            mean(solution_depth_arr), 
-                            mean(explored_states_arr), 
-                            mean(generated_states_arr), 
-                            mean(max_heap_size_arr)))
-    print("test case,pass rate,avg runtime,runtime stdev,max runtime,avg sol depth,avg explore states,avg generated states,avg max heap size")
+                            pass_rate,
+                            mean(runtime_arr),
+                            stdev(runtime_arr),
+                            maximum(runtime_arr),
+                            mean(solution_depth_arr),
+                            mean(search_depth_arr),
+                            mean(explored_states_arr),
+                            mean(generated_states_arr),
+                            mean(frontier_size_arr)))
+    print("test case,pass rate,avg runtime,runtime stdev,max runtime,avg sol depth,avg search depth,avg explore states,avg generated states,avg frontier size")
     for res in result:
         for item in res:
             sys.stdout.write(str(item) + ",")
