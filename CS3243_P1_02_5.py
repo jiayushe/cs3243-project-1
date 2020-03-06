@@ -74,6 +74,21 @@ def verify_solution(N, init_state, moves):
         curr_state = move(N, curr_state, move_dict[move])
     return curr_state == goal_state_dict[N]
 
+def tsplit(string, delimiters):
+    # Behaves str.split but supports multiple delimiters
+    # from http://code.activestate.com/recipes/577616-split-strings-w-multiple-separators/v
+    delimiters = tuple(delimiters)
+    stack = [string,]
+    
+    for delimiter in delimiters:
+        for i, substring in enumerate(stack):
+            substack = substring.split(delimiter)
+            stack.pop(i)
+            for j, _substring in enumerate(substack):
+                stack.insert(i+j, _substring)
+    print(stack)
+    return stack
+
 def generate_puzzle(n):
     init_state = None
     if n == 3:
@@ -164,9 +179,20 @@ if __name__ == '__main__':
                 return_code = process.wait()
                 timer.cancel()
                 runtime = time.time() - start_time
+                
                 if return_code == 0:
                     runtime_arr.append(runtime)
                     stdout, stderr = process.communicate()
+                    input_f = open(prefix + str(cnt) + '.in','r')
+                    init_state = tuple(map(int, tsplit(input_f.read(),('\n',' '))[:-1]))
+                    moves_f = open(prefix + str(cnt) + '_' + str(solution_index) + '.out','r')
+                    moves_list = moves_f.read().split("\n")
+                    solution_correct = verify_solution(dimension, init_state, moves_list)
+                    if not solution_correct:
+                        raise Exception("Solution incorrect: \n"\
+                                        + init_state + "\n" +\
+                                        moves_list)
+                        sys.exit(0)
                     res = stderr.split('\n')
                     solution_depth_arr.append(int(res[0].split(':')[1]))
                     explored_states_arr.append(int(res[1].split(':')[1]))
