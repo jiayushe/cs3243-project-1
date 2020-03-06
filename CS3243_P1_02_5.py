@@ -127,11 +127,11 @@ if __name__ == '__main__':
     random.seed(1)
     time_limit = 60
     sample_size = 10
-    for dimension in {3, 4, 5}:
+    for dimension in [3, 4, 5]:
         echo_cyan('Dimension = ' + str(dimension))
         prefix = 'experiment/test_' + str(dimension) + '_'
         generate_input(dimension, sample_size, prefix)
-        for solution_index in {1, 2, 3, 4}:
+        for solution_index in [1, 2, 3, 4]:
             solution_file = 'CS3243_P1_02_' + str(solution_index) + '.py'
             echo_cyan('Solution = ' + str(solution_file))
             runtime_arr = []
