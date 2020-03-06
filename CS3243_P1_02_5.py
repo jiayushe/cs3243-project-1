@@ -53,6 +53,16 @@ def move_to_number(move):
     else:
         return 4
 
+def get_goal_state(n):
+    if n == 3:
+        return (1, 2, 3, 4, 5, 6, 7, 8, 0)
+    elif n == 4:
+        return (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)
+    elif n == 5:
+        return (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)
+    else:
+        raise Exception("Unexpected dimension.")
+
 def move(n, state, action):
     new_state = list(state)
     index = new_state.index(0)
@@ -104,30 +114,13 @@ def read_solution(output_file):
 
 def verify_solution(n, init_state, moves):
     curr_state = init_state
-    goal_state = None
-    if n == 3:
-        goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 0)
-    elif n == 4:
-        goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)
-    elif n == 5:
-        goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)
-    else:
-        raise Exception("Unexpected dimension.")
+    goal_state = get_goal_state(n)
     for m in moves:
         curr_state = move(n, curr_state, move_to_number(m))
     return curr_state == goal_state
 
 def generate_puzzle(n):
-    init_state = None
-    if n == 3:
-        init_state = (1, 2, 3, 4, 5, 6, 7, 8, 0)
-    elif n == 4:
-        init_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)
-    elif n == 5:
-        init_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0)
-    else:
-        raise Exception("Unexpected dimension.")
-    curr_state = init_state
+    curr_state = get_goal_state(n)
     for i in range(100):
         r = random.randrange(4)+1
         action = number_to_move(r)
