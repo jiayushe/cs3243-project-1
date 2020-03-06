@@ -153,7 +153,7 @@ if __name__ == '__main__':
                 else:
                     sys.stdout.write('Time limit exceeded (' + str(time_limit) + 's)\n')
             echo_cyan('Pass Rate:')
-            sys.stdout.write(str(len(runtime_arr) // sample_size * 100) + '%\n')
+            sys.stdout.write(str(float(len(runtime_arr)) / sample_size * 100) + '%\n')
             echo_cyan('Average Runtime:')
             sys.stdout.write(str(mean(runtime_arr)) + 's\n')
             echo_cyan('Standard Deviation:')
