@@ -18,7 +18,7 @@ class Puzzle(object):
         # BEGIN profiling
         self.state_explored_count = 0
         self.state_visited_count = 0
-        self.max_heap_size = 0
+        self.frontier_size = 0
         self.max_depth = 0
         # END profiling
 
@@ -33,7 +33,7 @@ class Puzzle(object):
         sys.stderr.write("Max Search Depth: " + str(len(res)) + "\n")
         sys.stderr.write("State Explored: " + str(self.state_explored_count) + "\n")
         sys.stderr.write("State Generated: " + str(self.state_visited_count) + "\n")
-        sys.stderr.write("Max Heap Size: " + str(self.max_heap_size) + "\n")
+        sys.stderr.write("Frontier Size: " + str(self.frontier_size) + "\n")
         sys.stderr.flush()
         return res
     
@@ -78,7 +78,7 @@ class Puzzle(object):
         frontier.append(root)
 
         while frontier:
-            self.max_heap_size = max(self.max_heap_size, len(frontier))
+            self.frontier_size = max(self.frontier_size, len(frontier))
             node = frontier.popleft()
             neighbors = self.expand(node)
             for neighbor in neighbors:
